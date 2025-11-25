@@ -1,0 +1,88 @@
+# H2 Seep Detection - Model Configuration
+# Based on Ginzburg et al. (2025) methodology
+
+# Model Settings
+model:
+  name: "h2_seep_detector"
+  architecture: "yolov8n"  # Options: yolov8n, yolov8s, yolov8m, yolov8l, yolov8x
+  num_classes: 9
+  input_size: 640
+  confidence_threshold: 0.5
+  device: "auto"  # auto, cuda, cpu, mps
+
+# Class Definitions (9 classes from paper)
+classes:
+  - name: "SCD"
+    id: 0
+    description: "Sub-Circular Depression (H2-related)"
+    positive_class: true
+
+  - name: "fairy_circle"
+    id: 1
+    description: "Namibian fairy circles"
+    positive_class: false
+
+  - name: "fairy_fort"
+    id: 2
+    description: "Irish ring forts"
+    positive_class: false
+
+  - name: "farm_circle"
+    id: 3
+    description: "Agricultural circles (center pivot irrigation)"
+    positive_class: false
+
+  - name: "flooded_dune"
+    id: 4
+    description: "Flooded interdune areas"
+    positive_class: false
+
+  - name: "impact_crater"
+    id: 5
+    description: "Meteorite impact structures"
+    positive_class: false
+
+  - name: "karst"
+    id: 6
+    description: "Karst sinkholes and dolines"
+    positive_class: false
+
+  - name: "salt_lake"
+    id: 7
+    description: "Circular salt lakes"
+    positive_class: false
+
+  - name: "thermokarst"
+    id: 8
+    description: "Permafrost thaw lakes"
+    positive_class: false
+
+# Ensemble Configuration (optional)
+ensemble:
+  enabled: false
+  models:
+    - architecture: "yolov8n"
+      weights: "models/weights/yolov8n_best.pt"
+      weight: 0.3
+    - architecture: "yolov8s"
+      weights: "models/weights/yolov8s_best.pt"
+      weight: 0.4
+    - architecture: "yolov8m"
+      weights: "models/weights/yolov8m_best.pt"
+      weight: 0.3
+  aggregation: "weighted"  # mean, max, voting, weighted
+
+# Inference Settings
+inference:
+  batch_size: 16
+  workers: 4
+  half_precision: false
+  cache_predictions: true
+
+# Export Settings
+export:
+  formats:
+    - "onnx"
+    - "torchscript"
+  optimize: true
+  dynamic_batch: false

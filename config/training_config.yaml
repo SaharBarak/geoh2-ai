@@ -1,0 +1,132 @@
+# H2 Seep Detection - Training Configuration
+# Based on Ginzburg et al. (2025) methodology
+
+# Training Parameters
+training:
+  epochs: 50
+  batch_size: 16
+  patience: 10  # Early stopping patience
+
+  # Optimizer
+  optimizer: "adamw"  # adam, adamw, sgd
+  learning_rate: 0.001
+  weight_decay: 0.0005
+  momentum: 0.937  # For SGD
+
+  # Learning rate schedule
+  scheduler: "cosine"  # cosine, step, reduce_on_plateau
+  warmup_epochs: 3
+  warmup_momentum: 0.8
+  warmup_bias_lr: 0.1
+
+  # Mixed precision
+  amp: true  # Automatic Mixed Precision
+
+  # Gradient
+  gradient_accumulation: 1
+  gradient_clip: 10.0
+
+# Dataset Configuration
+dataset:
+  yaml_path: "data/dataset.yaml"
+  cache: true
+  workers: 8
+
+  # Class weights (optional, for imbalanced data)
+  class_weights: null  # or list of weights
+
+  # Sampling strategy
+  sampler: null  # null, weighted, balanced
+
+# Model Configuration
+model:
+  architecture: "yolov8n"
+  pretrained: true
+  freeze_backbone: false
+  dropout: 0.0
+
+  # Image size
+  imgsz: 640
+
+# Augmentation (training-time)
+augmentation:
+  hsv_h: 0.015  # Hue augmentation
+  hsv_s: 0.7    # Saturation augmentation
+  hsv_v: 0.4    # Value augmentation
+  degrees: 45   # Rotation degrees
+  translate: 0.1
+  scale: 0.5
+  shear: 0.0
+  perspective: 0.0
+  flipud: 0.5   # Vertical flip
+  fliplr: 0.5   # Horizontal flip
+  mosaic: 0.0   # Disabled for classification
+  mixup: 0.0    # Disabled for classification
+
+# Validation
+validation:
+  val_interval: 1  # Validate every N epochs
+  metrics:
+    - "accuracy"
+    - "precision"
+    - "recall"
+    - "f1"
+    - "confusion_matrix"
+
+# Checkpointing
+checkpointing:
+  save_dir: "runs/train"
+  save_best: true
+  save_last: true
+  save_period: 10  # Save every N epochs
+
+# Logging
+logging:
+  project: "h2_seep_detection"
+  name: null  # Auto-generated if null
+
+  # TensorBoard
+  tensorboard: true
+  tensorboard_dir: "runs/tensorboard"
+
+  # Weights & Biases (optional)
+  wandb: false
+  wandb_project: "h2-seep-detection"
+
+  # Logging frequency
+  log_images: true
+  log_interval: 10  # Log every N batches
+
+# Early Stopping
+early_stopping:
+  enabled: true
+  monitor: "val/accuracy_top1"
+  mode: "max"  # max or min
+  patience: 10
+  min_delta: 0.001
+
+# Callbacks
+callbacks:
+  - type: "early_stopping"
+    enabled: true
+
+  - type: "model_checkpoint"
+    enabled: true
+    save_best_only: true
+
+  - type: "lr_scheduler"
+    enabled: true
+
+  - type: "tensorboard"
+    enabled: true
+
+# Hardware
+hardware:
+  device: "auto"  # auto, cuda:0, cpu, mps
+  multi_gpu: false
+  sync_bn: false  # Synchronized BatchNorm for multi-GPU
+
+# Reproducibility
+reproducibility:
+  seed: 42
+  deterministic: true

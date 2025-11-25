@@ -5,11 +5,11 @@ High-level interface for making predictions
 
 import json
 from pathlib import Path
-from typing import Dict, Optional, Union
+from typing import Dict, List, Optional, Union
 
 import yaml
 
-from ..models import ModelConfig
+from ..models import ModelConfig, PredictionResult, ModelFactory
 from ..models.yolo_classifier import YOLOv8Classifier
 from ..utils.logger import setup_logger
 
@@ -158,9 +158,109 @@ class H2SeepPredictor:
 
         self.logger.info(f"Result saved to: {output_file}")
 
+    def predict_batch(
+        self,
+        image_paths: List[Union[str, Path]],
+        batch_size: int = 16,
+        save_results: bool = False,
+        output_dir: Optional[Path] = None
+    ) -> List[Dict]:
+        """
+        Predict class for multiple images.
+
+        Args:
+            image_paths: List of paths to input images
+            batch_size: Number of images per batch
+            save_results: Whether to save results to JSON
+            output_dir: Directory to save results
+
+        Returns:
+            List of prediction result dictionaries
+        """
+        self.logger.info(f"Batch predicting {len(image_paths)} images")
+
+        results = []
+        for i in range(0, len(image_paths), batch_size):
+            batch = image_paths[i:i + batch_size]
+            batch_results = self.classifier.predict_batch(batch)
+
+            for path, result in zip(batch, batch_results):
+                result_dict = result.to_dict()
+                result_dict["image_path"] = str(path)
+                results.append(result_dict)
+
+        # Save if requested
+        if save_results:
+            self._save_batch_results(results, output_dir)
+
+        self.logger.info(f"Batch prediction complete: {len(results)} images")
+        return results
+
+    def _save_batch_results(
+        self,
+        results: List[Dict],
+        output_dir: Optional[Path]
+    ) -> None:
+        """Save batch prediction results to JSON"""
+        if output_dir is None:
+            output_dir = Path("outputs/predictions")
+
+        output_dir = Path(output_dir)
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        # Create output filename
+        from datetime import datetime
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_file = output_dir / f"batch_predictions_{timestamp}.json"
+
+        # Summary
+        scd_count = sum(1 for r in results if r.get("is_scd", False))
+        summary = {
+            "total": len(results),
+            "scd_count": scd_count,
+            "timestamp": timestamp,
+        }
+
+        # Save
+        with open(output_file, "w") as f:
+            json.dump({"summary": summary, "predictions": results}, f, indent=2)
+
+        self.logger.info(f"Batch results saved to: {output_file}")
+
     def get_model_info(self) -> Dict:
         """Get information about loaded model"""
         return self.classifier.get_model_info()
+
+    @classmethod
+    def from_config(
+        cls,
+        config_path: Union[str, Path],
+        weights_path: Optional[str] = None,
+    ) -> "H2SeepPredictor":
+        """
+        Create predictor from configuration file.
+
+        Args:
+            config_path: Path to model config YAML
+            weights_path: Optional path to weights
+
+        Returns:
+            Configured H2SeepPredictor instance
+        """
+        return cls(config_path=config_path, weights_path=weights_path)
+
+    @classmethod
+    def default(cls, weights_path: Optional[str] = None) -> "H2SeepPredictor":
+        """
+        Create predictor with default configuration.
+
+        Args:
+            weights_path: Optional path to weights
+
+        Returns:
+            Default H2SeepPredictor instance
+        """
+        return cls(weights_path=weights_path)
 
 
 def main():

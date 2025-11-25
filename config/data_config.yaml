@@ -1,0 +1,138 @@
+# H2 Seep Detection - Data Configuration
+# Configuration for data acquisition and processing
+
+# Dataset Paths
+paths:
+  data_root: "data"
+  raw: "data/raw"
+  processed: "data/processed"
+  annotations: "data/annotations"
+  cache: "data/cache"
+
+# Sentinel-2 Configuration
+sentinel2:
+  enabled: true
+  provider: "sentinel_hub"  # sentinel_hub, earth_engine
+
+  # Sentinel Hub credentials (use .env or set here)
+  client_id: "${SENTINEL_HUB_CLIENT_ID}"
+  client_secret: "${SENTINEL_HUB_CLIENT_SECRET}"
+
+  # Data parameters
+  bands:
+    - "B2"   # Blue
+    - "B3"   # Green
+    - "B4"   # Red
+    - "B8"   # NIR
+    - "B11"  # SWIR1
+    - "B12"  # SWIR2
+
+  resolution: 10  # meters
+
+  # Cloud filtering
+  max_cloud_cover: 20  # percentage
+
+  # Temporal preferences
+  prefer_season: "dry"  # dry, wet, any
+  date_range:
+    start: "2020-01-01"
+    end: "2024-12-31"
+
+# Google Maps Configuration
+google_maps:
+  enabled: true
+  api_key: "${GOOGLE_MAPS_API_KEY}"
+
+  # Image parameters
+  zoom_level: 18
+  image_size: 640  # pixels
+  map_type: "satellite"  # satellite, hybrid
+
+  # Rate limiting
+  requests_per_second: 1
+  max_retries: 3
+
+  # Scraper settings (if using Selenium)
+  use_selenium: false
+  headless: true
+
+# Earth Engine Configuration
+earth_engine:
+  enabled: false
+  service_account: "${EARTHENGINE_ACCOUNT}"
+  credentials_path: "config/ee_credentials.json"
+
+  # Collection IDs
+  collections:
+    sentinel2: "COPERNICUS/S2_SR"
+    dem: "USGS/SRTMGL1_003"
+
+# Image Processing
+processing:
+  target_size: [640, 640]
+  normalize: true
+
+  # Boundary fitting (structure fills image)
+  boundary_fit: true
+  padding_ratio: 0.1
+
+  # Color space
+  color_space: "RGB"  # RGB, BGR
+
+# Spectral Indices
+spectral_indices:
+  primary:
+    - "ndvi"  # Normalized Difference Vegetation Index
+    - "bi"    # Brightness Index
+  secondary:
+    - "ndwi"
+    - "savi"
+    - "si"
+
+# Data Augmentation
+augmentation:
+  enabled: true
+
+  transforms:
+    horizontal_flip:
+      probability: 0.5
+
+    vertical_flip:
+      probability: 0.5
+
+    rotation:
+      probability: 0.5
+      limit: 45  # degrees
+
+    brightness_contrast:
+      probability: 0.3
+      brightness_limit: 0.2
+      contrast_limit: 0.2
+
+    color_jitter:
+      probability: 0.2
+      hue_shift: 10
+      saturation_shift: 20
+
+# Dataset Split
+split:
+  train_ratio: 0.8
+  val_ratio: 0.2
+  test_ratio: 0.0  # Using validation as test
+  random_seed: 42
+  stratify: true  # Stratified by class
+
+# Dataset Statistics (from paper)
+statistics:
+  total_samples: 540
+  samples_per_class: 60
+  class_distribution:
+    SCD: 60
+    fairy_circle: 60
+    fairy_fort: 60
+    farm_circle: 60
+    flooded_dune: 60
+    impact_crater: 60
+    karst: 60
+    salt_lake: 60
+    thermokarst: 60

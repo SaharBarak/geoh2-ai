@@ -1,0 +1,185 @@
+# H2 Seep Detection System - Docker Compose Configuration
+# Usage:
+#   Development: docker-compose up
+#   Production:  docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
+#   GPU:         docker-compose -f docker-compose.yml -f docker-compose.gpu.yml up
+
+version: '3.8'
+
+services:
+  # ==========================================================================
+  # Main API Service
+  # ==========================================================================
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    image: h2-seep-detection:latest
+    container_name: h2-seep-api
+    ports:
+      - "8000:8000"
+    environment:
+      - MODEL_CONFIG=/app/config/model_config.yaml
+      - MODEL_WEIGHTS=/app/models/weights/best.pt
+      - LOG_LEVEL=INFO
+      - WORKERS=4
+    volumes:
+      - ./config:/app/config:ro
+      - ./models/weights:/app/models/weights:ro
+      - ./data:/app/data
+      - ./outputs:/app/outputs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - h2detect-network
+
+  # ==========================================================================
+  # Development Service
+  # ==========================================================================
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    image: h2-seep-detection:dev
+    container_name: h2-seep-dev
+    ports:
+      - "8000:8000"
+      - "8888:8888"  # Jupyter
+    environment:
+      - MODEL_CONFIG=/app/config/model_config.yaml
+      - LOG_LEVEL=DEBUG
+    volumes:
+      - .:/app
+      - ./data:/app/data
+      - ./models/weights:/app/models/weights
+    command: uvicorn src.api:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - h2detect-network
+    profiles:
+      - dev
+
+  # ==========================================================================
+  # Batch Processing Worker
+  # ==========================================================================
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    image: h2-seep-detection:latest
+    container_name: h2-seep-worker
+    environment:
+      - MODEL_CONFIG=/app/config/model_config.yaml
+      - MODEL_WEIGHTS=/app/models/weights/best.pt
+    volumes:
+      - ./config:/app/config:ro
+      - ./models/weights:/app/models/weights:ro
+      - ./data:/app/data
+      - ./outputs:/app/outputs
+    command: python scripts/batch_process.py --input /app/data/input --output /app/outputs/results.json
+    depends_on:
+      - api
+    networks:
+      - h2detect-network
+    profiles:
+      - batch
+
+  # ==========================================================================
+  # Training Service
+  # ==========================================================================
+  trainer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    image: h2-seep-detection:latest
+    container_name: h2-seep-trainer
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+    volumes:
+      - ./config:/app/config:ro
+      - ./data:/app/data
+      - ./models/weights:/app/models/weights
+      - ./runs:/app/runs
+    command: python scripts/train_model.py --data /app/data/dataset.yaml --output /app/runs/train
+    networks:
+      - h2detect-network
+    profiles:
+      - train
+
+  # ==========================================================================
+  # TensorBoard for Training Monitoring
+  # ==========================================================================
+  tensorboard:
+    image: tensorflow/tensorflow:latest
+    container_name: h2-seep-tensorboard
+    ports:
+      - "6006:6006"
+    volumes:
+      - ./runs:/logs:ro
+    command: tensorboard --logdir=/logs --host=0.0.0.0 --port=6006
+    networks:
+      - h2detect-network
+    profiles:
+      - train
+      - monitoring
+
+  # ==========================================================================
+  # Redis Cache (optional, for API caching)
+  # ==========================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: h2-seep-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - h2detect-network
+    profiles:
+      - cache
+
+  # ==========================================================================
+  # Nginx Reverse Proxy (production)
+  # ==========================================================================
+  nginx:
+    image: nginx:alpine
+    container_name: h2-seep-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    depends_on:
+      - api
+    networks:
+      - h2detect-network
+    profiles:
+      - prod
+
+# ==========================================================================
+# Networks
+# ==========================================================================
+networks:
+  h2detect-network:
+    driver: bridge
+
+# ==========================================================================
+# Volumes
+# ==========================================================================
+volumes:
+  redis-data:

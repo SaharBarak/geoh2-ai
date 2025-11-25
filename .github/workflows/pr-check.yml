@@ -1,0 +1,134 @@
+# H2 Seep Detection - Pull Request Checks
+# Validates PRs before merge
+
+name: PR Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  # ===========================================================================
+  # PR Validation
+  # ===========================================================================
+  validate:
+    name: Validate PR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check PR title format
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          # Check for conventional commit format
+          if [[ ! "$PR_TITLE" =~ ^(feat|fix|docs|style|refactor|test|chore|perf|ci|build|revert)(\(.+\))?:\ .+ ]]; then
+            echo "Warning: PR title doesn't follow conventional commit format"
+            echo "Expected: type(scope): description"
+            echo "Got: $PR_TITLE"
+          fi
+
+      - name: Check for large files
+        run: |
+          # Find files larger than 10MB
+          LARGE_FILES=$(find . -type f -size +10M -not -path "./.git/*" 2>/dev/null || true)
+          if [ -n "$LARGE_FILES" ]; then
+            echo "Warning: Large files detected:"
+            echo "$LARGE_FILES"
+          fi
+
+  # ===========================================================================
+  # Code Quality
+  # ===========================================================================
+  quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          pip install black flake8 isort
+
+      - name: Check formatting
+        run: |
+          black --check --diff src tests || echo "::warning::Code formatting issues found"
+
+      - name: Check imports
+        run: |
+          isort --check-only --diff src tests || echo "::warning::Import sorting issues found"
+
+      - name: Lint code
+        run: |
+          flake8 src tests --count --exit-zero --statistics
+
+  # ===========================================================================
+  # Tests
+  # ===========================================================================
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pytest-cov
+
+      - name: Run tests
+        run: |
+          pytest tests/ -v --cov=src --cov-report=term-missing \
+            -m "not slow and not gpu" \
+            --tb=short
+
+      - name: Check coverage
+        run: |
+          COVERAGE=$(pytest tests/ --cov=src --cov-report=term -q 2>/dev/null | grep "TOTAL" | awk '{print $NF}' | tr -d '%')
+          if [ -n "$COVERAGE" ] && [ "$COVERAGE" -lt 50 ]; then
+            echo "::warning::Test coverage is below 50%"
+          fi
+
+  # ===========================================================================
+  # Build Check
+  # ===========================================================================
+  build:
+    name: Build Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Check package builds
+        run: |
+          pip install build
+          python -m build --sdist --wheel
+
+      - name: Check Docker builds
+        run: |
+          docker build --target production -t test-build .

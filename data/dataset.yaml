@@ -1,0 +1,72 @@
+# H2 Seep Detection Dataset Configuration
+# YOLOv8 Classification Format
+
+# Dataset paths (relative to this file or absolute)
+path: /path/to/your/dataset  # Update this path
+train: train  # train images directory
+val: val      # validation images directory
+test:         # optional test directory
+
+# Number of classes
+nc: 9
+
+# Class names (9 classes from Ginzburg et al. 2025)
+names:
+  0: SCD           # Sub-Circular Depression (H2-related) - POSITIVE CLASS
+  1: fairy_circle  # Namibian fairy circles
+  2: fairy_fort    # Irish ring forts
+  3: farm_circle   # Center-pivot irrigation circles
+  4: flooded_dune  # Flooded interdune areas
+  5: impact_crater # Meteorite impact structures
+  6: karst         # Karst sinkholes and dolines
+  7: salt_lake     # Circular salt lakes
+  8: thermokarst   # Permafrost thaw lakes
+
+# Expected directory structure:
+# dataset/
+# ├── train/
+# │   ├── SCD/
+# │   │   ├── image001.jpg
+# │   │   ├── image002.jpg
+# │   │   └── ...
+# │   ├── fairy_circle/
+# │   │   └── ...
+# │   ├── fairy_fort/
+# │   │   └── ...
+# │   ├── farm_circle/
+# │   │   └── ...
+# │   ├── flooded_dune/
+# │   │   └── ...
+# │   ├── impact_crater/
+# │   │   └── ...
+# │   ├── karst/
+# │   │   └── ...
+# │   ├── salt_lake/
+# │   │   └── ...
+# │   └── thermokarst/
+# │       └── ...
+# └── val/
+#     ├── SCD/
+#     │   └── ...
+#     ├── fairy_circle/
+#     │   └── ...
+#     └── ... (same structure as train)
+
+# Dataset Statistics (from paper):
+# - Total samples: 540 (60 per class)
+# - Train/Val split: 80/20 (450 train, 90 val)
+# - Image size: 640x640 pixels
+# - Format: Single structure per image, boundary-fitted
+
+# SCD (H2-related) Geographic Distribution:
+# - Russia: 12 samples
+# - USA: 6 samples
+# - Brazil: 24 samples
+# - Namibia: 18 samples
+
+# Data Sources:
+# - Google Maps: High-resolution visible imagery (<10m)
+# - Sentinel-2: Multispectral indices (NDVI, BI)
+
+# Original dataset available at:
+# Zenodo: doi:10.5281/zenodo.15376871
