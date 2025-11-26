@@ -173,8 +173,7 @@ def train_model(args):
     # Train
     trainer = Trainer(model, config)
 
-    from src.training import (CheckpointCallback, EarlyStoppingCallback,
-                              ProgressCallback)
+    from src.training import CheckpointCallback, EarlyStoppingCallback, ProgressCallback
 
     trainer.add_callback(EarlyStoppingCallback(patience=config.patience))
     trainer.add_callback(CheckpointCallback(save_dir=config.save_dir))

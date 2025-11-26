@@ -92,8 +92,14 @@ class Sentinel2Fetcher:
     def _init_sentinel_hub(self):
         """Initialize Sentinel Hub client."""
         try:
-            from sentinelhub import (CRS, BBox, DataCollection, MimeType,
-                                     SentinelHubRequest, SHConfig)
+            from sentinelhub import (
+                CRS,
+                BBox,
+                DataCollection,
+                MimeType,
+                SentinelHubRequest,
+                SHConfig,
+            )
 
             config = SHConfig()
             config.sh_client_id = self.config.client_id
