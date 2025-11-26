@@ -19,6 +19,7 @@ class TestAPIIntegration:
     def client(self):
         """Create test client."""
         from fastapi.testclient import TestClient
+
         from src.api import create_app
 
         app = create_app()
@@ -150,6 +151,7 @@ class TestAPIErrorHandling:
     def client(self):
         """Create test client."""
         from fastapi.testclient import TestClient
+
         from src.api import create_app
 
         app = create_app()

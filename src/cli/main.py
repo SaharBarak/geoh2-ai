@@ -50,7 +50,9 @@ def predict_single(args):
 def predict_batch(args):
     """Predict on multiple images."""
     import glob
+
     from tqdm import tqdm
+
     from src.models import ModelFactory
 
     # Find images
@@ -137,7 +139,7 @@ def predict_batch(args):
 
 def train_model(args):
     """Train a model."""
-    from src.models import ModelFactory, ModelConfig
+    from src.models import ModelConfig, ModelFactory
     from src.training import Trainer, TrainingConfig
 
     print("Initializing training...")
@@ -171,11 +173,8 @@ def train_model(args):
     # Train
     trainer = Trainer(model, config)
 
-    from src.training import (
-        EarlyStoppingCallback,
-        CheckpointCallback,
-        ProgressCallback,
-    )
+    from src.training import (CheckpointCallback, EarlyStoppingCallback,
+                              ProgressCallback)
 
     trainer.add_callback(EarlyStoppingCallback(patience=config.patience))
     trainer.add_callback(CheckpointCallback(save_dir=config.save_dir))
@@ -193,8 +192,9 @@ def train_model(args):
 
 def calculate_indices(args):
     """Calculate spectral indices."""
-    import rasterio
     import numpy as np
+    import rasterio
+
     from src.preprocessing import SpectralIndexCalculator
 
     print(f"Loading: {args.input}")

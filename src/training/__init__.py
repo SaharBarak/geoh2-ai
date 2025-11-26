@@ -7,16 +7,11 @@ Provides training infrastructure including:
 - Callbacks: Training hooks (early stopping, checkpointing, etc.)
 """
 
+from .callbacks import (Callback, CallbackList, CheckpointCallback,
+                        EarlyStoppingCallback, ProgressCallback,
+                        TensorBoardCallback)
 from .trainer import Trainer, TrainingConfig
-from .validator import Validator, ValidationResult
-from .callbacks import (
-    Callback,
-    CallbackList,
-    EarlyStoppingCallback,
-    CheckpointCallback,
-    TensorBoardCallback,
-    ProgressCallback,
-)
+from .validator import ValidationResult, Validator
 
 __all__ = [
     "Trainer",

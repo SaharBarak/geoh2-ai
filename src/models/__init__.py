@@ -5,8 +5,8 @@ Provides model architectures for classifying sub-circular depressions.
 """
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional
 from enum import Enum
+from typing import Dict, List, Optional
 
 
 class ModelArchitecture(Enum):
@@ -83,9 +83,9 @@ class PredictionResult:
 
 # Imports for convenient access
 from .base_model import BaseDetectionModel
-from .yolo_classifier import YOLOv8Classifier
 from .ensemble import EnsembleModel
 from .model_factory import ModelFactory, create_model
+from .yolo_classifier import YOLOv8Classifier
 
 __all__ = [
     "ModelConfig",

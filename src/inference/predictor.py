@@ -9,7 +9,7 @@ from typing import Dict, List, Optional, Union
 
 import yaml
 
-from ..models import ModelConfig, PredictionResult, ModelFactory
+from ..models import ModelConfig, ModelFactory, PredictionResult
 from ..models.yolo_classifier import YOLOv8Classifier
 from ..utils.logger import setup_logger
 

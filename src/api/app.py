@@ -14,7 +14,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .routes import router
 
-
 # Global model instance
 _model = None
 
@@ -41,7 +40,7 @@ async def lifespan(app: FastAPI):
     # Startup
     print("Loading H2 seep detection model...")
 
-    from src.models import ModelFactory, ModelConfig
+    from src.models import ModelConfig, ModelFactory
 
     # Load model configuration
     config_path = os.environ.get("MODEL_CONFIG", "config/model_config.yaml")

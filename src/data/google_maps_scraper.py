@@ -143,8 +143,9 @@ class GoogleMapsScraper:
                 response.raise_for_status()
 
                 # Parse image
-                from PIL import Image
                 import io
+
+                from PIL import Image
 
                 img = Image.open(io.BytesIO(response.content))
                 img_array = np.array(img)
@@ -174,12 +175,13 @@ class GoogleMapsScraper:
     ) -> Optional[GoogleMapsImage]:
         """Download using Selenium browser automation."""
         try:
+            import io
+
+            from PIL import Image
             from selenium import webdriver
             from selenium.webdriver.chrome.options import Options
             from selenium.webdriver.chrome.service import Service
             from webdriver_manager.chrome import ChromeDriverManager
-            from PIL import Image
-            import io
 
             # Initialize driver if needed
             if self._driver is None:

@@ -8,10 +8,10 @@ Provides a clean interface for creating different model types.
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 
-from . import ModelConfig, DEFAULT_CLASS_NAMES
+from . import DEFAULT_CLASS_NAMES, ModelConfig
 from .base_model import BaseDetectionModel
+from .ensemble import AggregationMethod, EnsembleModel
 from .yolo_classifier import YOLOv8Classifier
-from .ensemble import EnsembleModel, AggregationMethod
 
 
 class ModelFactory:

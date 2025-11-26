@@ -362,6 +362,7 @@ class TestAPIEndpoints:
     def test_client(self):
         """Create test client."""
         from fastapi.testclient import TestClient
+
         from src.api import app
 
         return TestClient(app)
@@ -397,7 +398,8 @@ class TestEndToEndPipeline:
     def test_complete_prediction_workflow(self, temp_dir):
         """Test complete workflow from image to prediction."""
         import cv2
-        from src.models import ModelFactory, ModelConfig
+
+        from src.models import ModelConfig, ModelFactory
 
         # Create test image
         img = np.random.randint(0, 255, (640, 640, 3), dtype=np.uint8)
@@ -434,9 +436,10 @@ class TestEndToEndPipeline:
 
     def test_spectral_to_classification_pipeline(self, temp_dir):
         """Test pipeline from spectral indices to classification."""
-        from src.preprocessing import SpectralIndexCalculator, ImageProcessor
-        from src.models import ModelFactory, ModelConfig
         import cv2
+
+        from src.models import ModelConfig, ModelFactory
+        from src.preprocessing import ImageProcessor, SpectralIndexCalculator
 
         # Generate synthetic spectral data
         np.random.seed(42)

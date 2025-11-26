@@ -15,7 +15,7 @@ from typing import Callable, Dict, List, Optional, Union
 
 import numpy as np
 
-from . import IndexResult, INDEX_DEFINITIONS
+from . import INDEX_DEFINITIONS, IndexResult
 
 
 class SpectralIndexCalculator:

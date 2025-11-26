@@ -121,9 +121,9 @@ INDEX_DEFINITIONS = {
 }
 
 
-from .spectral_indices import SpectralIndexCalculator
-from .image_processor import ImageProcessor
 from .coordinate_handler import CoordinateHandler
+from .image_processor import ImageProcessor
+from .spectral_indices import SpectralIndexCalculator
 
 __all__ = [
     "SpectralBand",

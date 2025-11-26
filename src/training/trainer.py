@@ -113,6 +113,7 @@ class Trainer:
     def _set_seed(self, seed: int) -> None:
         """Set random seed for reproducibility."""
         import random
+
         import numpy as np
 
         random.seed(seed)

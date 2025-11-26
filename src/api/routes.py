@@ -166,6 +166,7 @@ async def predict_batch(
     Returns list of predictions with summary statistics.
     """
     import time
+
     from .app import get_model
 
     model = get_model()
@@ -321,8 +322,9 @@ async def calculate_spectral_indices(
     - **indices**: Indices to compute (ndvi, bi, ndwi, savi, etc.)
     """
     try:
-        from src.preprocessing import SpectralIndexCalculator
         import rasterio
+
+        from src.preprocessing import SpectralIndexCalculator
 
         # Parse requested indices
         index_list = [i.strip().lower() for i in indices.split(",")]

@@ -320,8 +320,9 @@ def plot_class_distribution(
         figsize: Figure size
         save_path: Optional path to save figure
     """
-    import matplotlib.pyplot as plt
     from collections import Counter
+
+    import matplotlib.pyplot as plt
 
     # Count classes
     class_counts = Counter(p.class_name for p in predictions)
