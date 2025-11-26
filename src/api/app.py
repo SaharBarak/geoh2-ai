@@ -20,7 +20,6 @@ _model = None
 
 def get_model():
     """Get the global model instance."""
-    global _model
     return _model
 
 
