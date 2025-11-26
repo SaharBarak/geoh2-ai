@@ -76,7 +76,7 @@ jobs:
             type=sha
 
       - name: Build and push (CPU)
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           target: production
@@ -88,7 +88,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Build and push (GPU)
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           target: gpu
