@@ -24,7 +24,7 @@ class H2SeepPredictor:
         self,
         config_path: Optional[Union[str, Path]] = None,
         weights_path: Optional[Union[str, Path]] = None,
-        device: str = "cuda"
+        device: str = "cuda",
     ):
         """
         Initialize predictor.
@@ -39,19 +39,14 @@ class H2SeepPredictor:
         # Load configuration
         if config_path:
             config_dict = self.load_config(config_path)
-            self.model_config = self._config_dict_to_model_config(
-                config_dict, device
-            )
+            self.model_config = self._config_dict_to_model_config(config_dict, device)
         else:
             # Default configuration
             self.model_config = self._default_config(device)
 
         # Initialize model
         self.logger.info(f"Initializing model: {self.model_config.architecture}")
-        self.classifier = YOLOv8Classifier(
-            self.model_config,
-            weights_path=weights_path
-        )
+        self.classifier = YOLOv8Classifier(self.model_config, weights_path=weights_path)
 
         self.logger.info(f"Model loaded on device: {self.classifier.device}")
 
@@ -73,7 +68,7 @@ class H2SeepPredictor:
             class_names=model_cfg["classes"]["class_names"],
             input_size=model_cfg["input_size"],
             confidence_threshold=model_cfg["thresholds"]["classification"],
-            device=device
+            device=device,
         )
 
     def _default_config(self, device: str) -> ModelConfig:
@@ -83,13 +78,19 @@ class H2SeepPredictor:
             architecture="yolov8n",
             num_classes=9,
             class_names=[
-                "SCD", "fairy_circle", "fairy_fort", "farm_circle",
-                "flooded_dune", "impact_crater", "karst", "salt_lake",
-                "thermokarst"
+                "SCD",
+                "fairy_circle",
+                "fairy_fort",
+                "farm_circle",
+                "flooded_dune",
+                "impact_crater",
+                "karst",
+                "salt_lake",
+                "thermokarst",
             ],
             input_size=640,
             confidence_threshold=0.5,
-            device=device
+            device=device,
         )
 
     def predict(
@@ -97,7 +98,7 @@ class H2SeepPredictor:
         image_path: Union[str, Path],
         return_probs: bool = False,
         save_result: bool = False,
-        output_dir: Optional[Path] = None
+        output_dir: Optional[Path] = None,
     ) -> Dict:
         """
         Predict class for single image.
@@ -136,10 +137,7 @@ class H2SeepPredictor:
         return result
 
     def _save_result(
-        self,
-        result: Dict,
-        image_path: Path,
-        output_dir: Optional[Path]
+        self, result: Dict, image_path: Path, output_dir: Optional[Path]
     ) -> None:
         """Save prediction result to JSON"""
         if output_dir is None:
@@ -163,7 +161,7 @@ class H2SeepPredictor:
         image_paths: List[Union[str, Path]],
         batch_size: int = 16,
         save_results: bool = False,
-        output_dir: Optional[Path] = None
+        output_dir: Optional[Path] = None,
     ) -> List[Dict]:
         """
         Predict class for multiple images.
@@ -181,7 +179,7 @@ class H2SeepPredictor:
 
         results = []
         for i in range(0, len(image_paths), batch_size):
-            batch = image_paths[i:i + batch_size]
+            batch = image_paths[i : i + batch_size]
             batch_results = self.classifier.predict_batch(batch)
 
             for path, result in zip(batch, batch_results):
@@ -197,9 +195,7 @@ class H2SeepPredictor:
         return results
 
     def _save_batch_results(
-        self,
-        results: List[Dict],
-        output_dir: Optional[Path]
+        self, results: List[Dict], output_dir: Optional[Path]
     ) -> None:
         """Save batch prediction results to JSON"""
         if output_dir is None:
@@ -210,6 +206,7 @@ class H2SeepPredictor:
 
         # Create output filename
         from datetime import datetime
+
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         output_file = output_dir / f"batch_predictions_{timestamp}.json"
 
@@ -270,40 +267,31 @@ def main():
     parser = argparse.ArgumentParser(
         description="H2 Seep Detection - Single Image Prediction"
     )
-    parser.add_argument(
-        "image",
-        type=str,
-        help="Path to input image"
-    )
+    parser.add_argument("image", type=str, help="Path to input image")
     parser.add_argument(
         "--config",
         type=str,
         default="config/model_config.yaml",
-        help="Path to model configuration"
+        help="Path to model configuration",
     )
     parser.add_argument(
-        "--weights",
-        type=str,
-        default=None,
-        help="Path to model weights"
+        "--weights", type=str, default=None, help="Path to model weights"
     )
     parser.add_argument(
         "--device",
         type=str,
         default="cuda",
         choices=["cuda", "cpu"],
-        help="Device to run on"
+        help="Device to run on",
     )
     parser.add_argument(
-        "--save",
-        action="store_true",
-        help="Save prediction result to JSON"
+        "--save", action="store_true", help="Save prediction result to JSON"
     )
     parser.add_argument(
         "--output-dir",
         type=str,
         default="outputs/predictions",
-        help="Output directory for results"
+        help="Output directory for results",
     )
 
     args = parser.parse_args()
@@ -312,7 +300,7 @@ def main():
     predictor = H2SeepPredictor(
         config_path=args.config if Path(args.config).exists() else None,
         weights_path=args.weights,
-        device=args.device
+        device=args.device,
     )
 
     # Run prediction
@@ -320,25 +308,23 @@ def main():
         args.image,
         return_probs=True,
         save_result=args.save,
-        output_dir=Path(args.output_dir)
+        output_dir=Path(args.output_dir),
     )
 
     # Print result
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Prediction Result")
-    print("="*60)
+    print("=" * 60)
     print(f"Image: {result['image_path']}")
     print(f"Class: {result['class_name']}")
     print(f"Confidence: {result['confidence']:.2%}")
     print(f"Is H2 Seep: {result['is_scd']}")
     print("\nProbability Distribution:")
     for class_name, prob in sorted(
-        result['probabilities'].items(),
-        key=lambda x: x[1],
-        reverse=True
+        result["probabilities"].items(), key=lambda x: x[1], reverse=True
     ):
         print(f"  {class_name:20s}: {prob:.2%}")
-    print("="*60 + "\n")
+    print("=" * 60 + "\n")
 
 
 if __name__ == "__main__":

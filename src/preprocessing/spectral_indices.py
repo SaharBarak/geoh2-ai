@@ -54,9 +54,7 @@ class SpectralIndexCalculator:
         return list(self._indices.keys())
 
     def _safe_divide(
-        self,
-        numerator: np.ndarray,
-        denominator: np.ndarray
+        self, numerator: np.ndarray, denominator: np.ndarray
     ) -> np.ndarray:
         """
         Safe division handling zero denominators.
@@ -68,11 +66,9 @@ class SpectralIndexCalculator:
         Returns:
             Result with NaN where denominator is zero
         """
-        with np.errstate(divide='ignore', invalid='ignore'):
+        with np.errstate(divide="ignore", invalid="ignore"):
             result = np.where(
-                np.abs(denominator) > self.epsilon,
-                numerator / denominator,
-                np.nan
+                np.abs(denominator) > self.epsilon, numerator / denominator, np.nan
             )
         return result
 
@@ -99,10 +95,7 @@ class SpectralIndexCalculator:
         return band
 
     def compute(
-        self,
-        index_name: str,
-        bands: Dict[str, np.ndarray],
-        **kwargs
+        self, index_name: str, bands: Dict[str, np.ndarray], **kwargs
     ) -> IndexResult:
         """
         Compute a spectral index.
@@ -119,8 +112,7 @@ class SpectralIndexCalculator:
 
         if index_name not in self._indices:
             raise ValueError(
-                f"Unknown index: {index_name}. "
-                f"Available: {self.available_indices}"
+                f"Unknown index: {index_name}. " f"Available: {self.available_indices}"
             )
 
         # Get the calculation function
@@ -130,10 +122,7 @@ class SpectralIndexCalculator:
         return calc_func(bands=bands, **kwargs)
 
     def compute_multiple(
-        self,
-        index_names: List[str],
-        bands: Dict[str, np.ndarray],
-        **kwargs
+        self, index_names: List[str], bands: Dict[str, np.ndarray], **kwargs
     ) -> Dict[str, IndexResult]:
         """
         Compute multiple spectral indices.
@@ -156,9 +145,7 @@ class SpectralIndexCalculator:
         return results
 
     def compute_all(
-        self,
-        bands: Dict[str, np.ndarray],
-        **kwargs
+        self, bands: Dict[str, np.ndarray], **kwargs
     ) -> Dict[str, IndexResult]:
         """
         Compute all available indices.
@@ -217,7 +204,7 @@ class SpectralIndexCalculator:
             name="NDVI",
             value=ndvi_values,
             valid_range=(-1, 1),
-            metadata={"formula": "(NIR - RED) / (NIR + RED)"}
+            metadata={"formula": "(NIR - RED) / (NIR + RED)"},
         )
 
     def brightness_index(
@@ -258,7 +245,7 @@ class SpectralIndexCalculator:
             name="BI",
             value=bi_values,
             valid_range=(0, 1),
-            metadata={"formula": "sqrt((RED^2 + NIR^2) / 2)"}
+            metadata={"formula": "sqrt((RED^2 + NIR^2) / 2)"},
         )
 
     # ================================================================
@@ -305,7 +292,7 @@ class SpectralIndexCalculator:
             name="NDWI",
             value=ndwi_values,
             valid_range=(-1, 1),
-            metadata={"formula": "(GREEN - NIR) / (GREEN + NIR)"}
+            metadata={"formula": "(GREEN - NIR) / (GREEN + NIR)"},
         )
 
     def savi(
@@ -350,7 +337,7 @@ class SpectralIndexCalculator:
             name="SAVI",
             value=savi_values,
             valid_range=(-1, 1),
-            metadata={"formula": f"((NIR - RED) / (NIR + RED + {L})) * (1 + {L})"}
+            metadata={"formula": f"((NIR - RED) / (NIR + RED + {L})) * (1 + {L})"},
         )
 
     def evi(
@@ -402,7 +389,7 @@ class SpectralIndexCalculator:
             name="EVI",
             value=evi_values,
             valid_range=(-1, 1),
-            metadata={"formula": "2.5 * (NIR - RED) / (NIR + 6*RED - 7.5*BLUE + 1)"}
+            metadata={"formula": "2.5 * (NIR - RED) / (NIR + 6*RED - 7.5*BLUE + 1)"},
         )
 
     def ndmi(
@@ -445,7 +432,7 @@ class SpectralIndexCalculator:
             name="NDMI",
             value=ndmi_values,
             valid_range=(-1, 1),
-            metadata={"formula": "(NIR - SWIR) / (NIR + SWIR)"}
+            metadata={"formula": "(NIR - SWIR) / (NIR + SWIR)"},
         )
 
     def salinity_index(
@@ -485,7 +472,7 @@ class SpectralIndexCalculator:
             name="SI",
             value=si_values,
             valid_range=(0, 1),
-            metadata={"formula": "sqrt(GREEN * RED)"}
+            metadata={"formula": "sqrt(GREEN * RED)"},
         )
 
     def ndsi(
@@ -528,7 +515,7 @@ class SpectralIndexCalculator:
             name="NDSI",
             value=ndsi_values,
             valid_range=(-1, 1),
-            metadata={"formula": "(RED - NIR) / (RED + NIR)"}
+            metadata={"formula": "(RED - NIR) / (RED + NIR)"},
         )
 
     def nbr(
@@ -571,7 +558,7 @@ class SpectralIndexCalculator:
             name="NBR",
             value=nbr_values,
             valid_range=(-1, 1),
-            metadata={"formula": "(NIR - SWIR2) / (NIR + SWIR2)"}
+            metadata={"formula": "(NIR - SWIR2) / (NIR + SWIR2)"},
         )
 
     # ================================================================

@@ -14,6 +14,7 @@ from sklearn.cluster import DBSCAN
 @dataclass
 class Cluster:
     """Represents a spatial cluster of structures"""
+
     cluster_id: int
     size: int
     centroid: Tuple[float, float]  # (lon, lat)
@@ -29,7 +30,7 @@ class Cluster:
             "centroid": self.centroid,
             "avg_confidence": float(self.avg_confidence),
             "scd_percentage": float(self.scd_percentage),
-            "is_high_priority": self.is_high_priority()
+            "is_high_priority": self.is_high_priority(),
         }
 
     def is_high_priority(self, threshold: float = 0.7) -> bool:
@@ -43,11 +44,7 @@ class SpatialAnalyzer:
     Identifies clusters and spatial relationships.
     """
 
-    def __init__(
-        self,
-        distance_threshold_km: float = 5.0,
-        min_cluster_size: int = 3
-    ):
+    def __init__(self, distance_threshold_km: float = 5.0, min_cluster_size: int = 3):
         """
         Initialize spatial analyzer.
 
@@ -59,9 +56,7 @@ class SpatialAnalyzer:
         self.min_cluster_size = min_cluster_size
 
     def haversine_distance(
-        self,
-        coord1: Tuple[float, float],
-        coord2: Tuple[float, float]
+        self, coord1: Tuple[float, float], coord2: Tuple[float, float]
     ) -> float:
         """
         Calculate haversine distance between two coordinates.
@@ -79,8 +74,7 @@ class SpatialAnalyzer:
         dlat = lat2 - lat1
         dlon = lon2 - lon1
 
-        a = np.sin(dlat/2)**2 + \
-            np.cos(lat1) * np.cos(lat2) * np.sin(dlon/2)**2
+        a = np.sin(dlat / 2) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2) ** 2
         c = 2 * np.arcsin(np.sqrt(a))
 
         # Earth radius in km
@@ -89,8 +83,7 @@ class SpatialAnalyzer:
         return c * r
 
     def compute_distance_matrix(
-        self,
-        coordinates: List[Tuple[float, float]]
+        self, coordinates: List[Tuple[float, float]]
     ) -> np.ndarray:
         """
         Compute pairwise distance matrix.
@@ -113,9 +106,7 @@ class SpatialAnalyzer:
         return distances
 
     def cluster_structures(
-        self,
-        coordinates: List[Tuple[float, float]],
-        predictions: Optional[List] = None
+        self, coordinates: List[Tuple[float, float]], predictions: Optional[List] = None
     ) -> Tuple[List[Cluster], np.ndarray]:
         """
         Cluster structures using DBSCAN.
@@ -138,9 +129,7 @@ class SpatialAnalyzer:
         eps_rad = self.distance_threshold_km / 6371.0
 
         clustering = DBSCAN(
-            eps=eps_rad,
-            min_samples=self.min_cluster_size,
-            metric='haversine'
+            eps=eps_rad, min_samples=self.min_cluster_size, metric="haversine"
         ).fit(coords_rad)
 
         labels = clustering.labels_
@@ -176,7 +165,7 @@ class SpatialAnalyzer:
                 centroid=centroid,
                 members=member_indices,
                 avg_confidence=avg_confidence,
-                scd_percentage=scd_percentage
+                scd_percentage=scd_percentage,
             )
 
             clusters.append(cluster)
@@ -187,9 +176,7 @@ class SpatialAnalyzer:
         return clusters, labels
 
     def compute_spatial_statistics(
-        self,
-        coordinates: List[Tuple[float, float]],
-        predictions: Optional[List] = None
+        self, coordinates: List[Tuple[float, float]], predictions: Optional[List] = None
     ) -> Dict:
         """
         Compute comprehensive spatial statistics.
@@ -219,7 +206,11 @@ class SpatialAnalyzer:
         # Clustering metrics
         n_clusters = len(clusters)
         n_noise = np.sum(labels == -1)
-        clustered_percentage = (len(coordinates) - n_noise) / len(coordinates) if len(coordinates) > 0 else 0.0
+        clustered_percentage = (
+            (len(coordinates) - n_noise) / len(coordinates)
+            if len(coordinates) > 0
+            else 0.0
+        )
 
         stats = {
             "total_structures": len(coordinates),
@@ -231,16 +222,19 @@ class SpatialAnalyzer:
             "clusters": [c.to_dict() for c in clusters],
             "high_priority_clusters": [
                 c.to_dict() for c in clusters if c.is_high_priority()
-            ]
+            ],
         }
 
         if predictions:
             scd_coords = [
-                coord for coord, pred in zip(coordinates, predictions)
+                coord
+                for coord, pred in zip(coordinates, predictions)
                 if pred.class_name == "SCD"
             ]
             stats["scd_count"] = len(scd_coords)
-            stats["scd_percentage"] = len(scd_coords) / len(predictions) if predictions else 0.0
+            stats["scd_percentage"] = (
+                len(scd_coords) / len(predictions) if predictions else 0.0
+            )
 
         return stats
 
@@ -248,7 +242,7 @@ class SpatialAnalyzer:
         self,
         coordinates: List[Tuple[float, float]],
         grid_size: int = 50,
-        weights: Optional[List[float]] = None
+        weights: Optional[List[float]] = None,
     ) -> Tuple[np.ndarray, Tuple[float, float, float, float]]:
         """
         Generate density heatmap grid.

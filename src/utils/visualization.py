@@ -42,12 +42,14 @@ def plot_confusion_matrix(
 
     # Normalize if requested
     if normalize:
-        cm = confusion_matrix.astype('float') / (confusion_matrix.sum(axis=1, keepdims=True) + 1e-8)
+        cm = confusion_matrix.astype("float") / (
+            confusion_matrix.sum(axis=1, keepdims=True) + 1e-8
+        )
     else:
         cm = confusion_matrix
 
     # Plot
-    im = ax.imshow(cm, interpolation='nearest', cmap=cmap)
+    im = ax.imshow(cm, interpolation="nearest", cmap=cmap)
     ax.figure.colorbar(im, ax=ax)
 
     # Labels
@@ -57,27 +59,32 @@ def plot_confusion_matrix(
         xticklabels=class_names,
         yticklabels=class_names,
         title=title,
-        ylabel='True Label',
-        xlabel='Predicted Label'
+        ylabel="True Label",
+        xlabel="Predicted Label",
     )
 
     # Rotate x labels
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
 
     # Add text annotations
-    thresh = cm.max() / 2.
+    thresh = cm.max() / 2.0
     for i in range(len(class_names)):
         for j in range(len(class_names)):
             value = f"{cm[i, j]:.2f}" if normalize else f"{confusion_matrix[i, j]}"
-            ax.text(j, i, value,
-                   ha="center", va="center",
-                   color="white" if cm[i, j] > thresh else "black",
-                   fontsize=8)
+            ax.text(
+                j,
+                i,
+                value,
+                ha="center",
+                va="center",
+                color="white" if cm[i, j] > thresh else "black",
+                fontsize=8,
+            )
 
     fig.tight_layout()
 
     if save_path:
-        plt.savefig(save_path, dpi=150, bbox_inches='tight')
+        plt.savefig(save_path, dpi=150, bbox_inches="tight")
 
     return fig, ax
 
@@ -112,25 +119,22 @@ def plot_roc_curves(
         tpr = tpr_dict[class_name]
         auc = auc_dict.get(class_name, 0)
 
-        ax.plot(
-            fpr, tpr, color=color,
-            label=f'{class_name} (AUC = {auc:.3f})'
-        )
+        ax.plot(fpr, tpr, color=color, label=f"{class_name} (AUC = {auc:.3f})")
 
     # Diagonal line
-    ax.plot([0, 1], [0, 1], 'k--', label='Random')
+    ax.plot([0, 1], [0, 1], "k--", label="Random")
 
     ax.set_xlim([0.0, 1.0])
     ax.set_ylim([0.0, 1.05])
-    ax.set_xlabel('False Positive Rate')
-    ax.set_ylabel('True Positive Rate')
+    ax.set_xlabel("False Positive Rate")
+    ax.set_ylabel("True Positive Rate")
     ax.set_title(title)
     ax.legend(loc="lower right", fontsize=8)
 
     fig.tight_layout()
 
     if save_path:
-        plt.savefig(save_path, dpi=150, bbox_inches='tight')
+        plt.savefig(save_path, dpi=150, bbox_inches="tight")
 
     return fig, ax
 
@@ -168,10 +172,10 @@ def plot_training_history(
             values = history[metric]
             epochs = range(1, len(values) + 1)
 
-            ax.plot(epochs, values, 'b-', label=metric)
-            ax.set_xlabel('Epoch')
+            ax.plot(epochs, values, "b-", label=metric)
+            ax.set_xlabel("Epoch")
             ax.set_ylabel(metric)
-            ax.set_title(metric.replace('_', ' ').title())
+            ax.set_title(metric.replace("_", " ").title())
             ax.legend()
             ax.grid(True, alpha=0.3)
 
@@ -179,7 +183,7 @@ def plot_training_history(
     fig.tight_layout()
 
     if save_path:
-        plt.savefig(save_path, dpi=150, bbox_inches='tight')
+        plt.savefig(save_path, dpi=150, bbox_inches="tight")
 
     return fig, axes
 
@@ -207,28 +211,25 @@ def plot_confidence_histogram(
 
     # Extract confidences
     if class_name:
-        confidences = [
-            p.confidence for p in predictions
-            if p.class_name == class_name
-        ]
+        confidences = [p.confidence for p in predictions if p.class_name == class_name]
         title = f"{title} - {class_name}"
     else:
         confidences = [p.confidence for p in predictions]
 
     fig, ax = plt.subplots(figsize=figsize)
 
-    ax.hist(confidences, bins=bins, edgecolor='black', alpha=0.7)
-    ax.axvline(0.5, color='r', linestyle='--', label='Threshold (0.5)')
+    ax.hist(confidences, bins=bins, edgecolor="black", alpha=0.7)
+    ax.axvline(0.5, color="r", linestyle="--", label="Threshold (0.5)")
 
-    ax.set_xlabel('Confidence')
-    ax.set_ylabel('Count')
+    ax.set_xlabel("Confidence")
+    ax.set_ylabel("Count")
     ax.set_title(title)
     ax.legend()
 
     fig.tight_layout()
 
     if save_path:
-        plt.savefig(save_path, dpi=150, bbox_inches='tight')
+        plt.savefig(save_path, dpi=150, bbox_inches="tight")
 
     return fig, ax
 
@@ -271,21 +272,27 @@ def plot_predictions_on_map(
     # Plot other classes
     if other_coords:
         lons, lats = zip(*other_coords)
-        ax.scatter(lons, lats, c='gray', s=30, alpha=0.5, label='Non-SCD')
+        ax.scatter(lons, lats, c="gray", s=30, alpha=0.5, label="Non-SCD")
 
     # Plot SCDs with confidence coloring
     if scd_coords:
         lons, lats = zip(*scd_coords)
         scatter = ax.scatter(
-            lons, lats, c=scd_conf, s=50,
-            cmap='RdYlGn', vmin=0.5, vmax=1.0,
-            edgecolors='black', linewidths=0.5,
-            label='SCD'
+            lons,
+            lats,
+            c=scd_conf,
+            s=50,
+            cmap="RdYlGn",
+            vmin=0.5,
+            vmax=1.0,
+            edgecolors="black",
+            linewidths=0.5,
+            label="SCD",
         )
-        plt.colorbar(scatter, ax=ax, label='Confidence')
+        plt.colorbar(scatter, ax=ax, label="Confidence")
 
-    ax.set_xlabel('Longitude')
-    ax.set_ylabel('Latitude')
+    ax.set_xlabel("Longitude")
+    ax.set_ylabel("Latitude")
     ax.set_title(title)
     ax.legend()
     ax.grid(True, alpha=0.3)
@@ -293,7 +300,7 @@ def plot_predictions_on_map(
     fig.tight_layout()
 
     if save_path:
-        plt.savefig(save_path, dpi=150, bbox_inches='tight')
+        plt.savefig(save_path, dpi=150, bbox_inches="tight")
 
     return fig, ax
 
@@ -325,9 +332,9 @@ def plot_class_distribution(
     counts = list(class_counts.values())
 
     # Color SCD differently
-    colors = ['green' if c == 'SCD' else 'steelblue' for c in classes]
+    colors = ["green" if c == "SCD" else "steelblue" for c in classes]
 
-    bars = ax.bar(classes, counts, color=colors, edgecolor='black')
+    bars = ax.bar(classes, counts, color=colors, edgecolor="black")
 
     # Add count labels
     for bar, count in zip(bars, counts):
@@ -335,18 +342,19 @@ def plot_class_distribution(
             bar.get_x() + bar.get_width() / 2,
             bar.get_height() + 0.5,
             str(count),
-            ha='center', va='bottom'
+            ha="center",
+            va="bottom",
         )
 
-    ax.set_xlabel('Class')
-    ax.set_ylabel('Count')
+    ax.set_xlabel("Class")
+    ax.set_ylabel("Count")
     ax.set_title(title)
-    plt.xticks(rotation=45, ha='right')
+    plt.xticks(rotation=45, ha="right")
 
     fig.tight_layout()
 
     if save_path:
-        plt.savefig(save_path, dpi=150, bbox_inches='tight')
+        plt.savefig(save_path, dpi=150, bbox_inches="tight")
 
     return fig, ax
 
@@ -380,27 +388,27 @@ def visualize_spectral_indices(
 
     for ax, (name, values) in zip(axes, indices.items()):
         # Handle IndexResult objects
-        if hasattr(values, 'value'):
+        if hasattr(values, "value"):
             data = values.value
             vmin, vmax = values.valid_range
         else:
             data = values
             vmin, vmax = np.nanmin(data), np.nanmax(data)
 
-        im = ax.imshow(data, cmap='RdYlGn', vmin=vmin, vmax=vmax)
+        im = ax.imshow(data, cmap="RdYlGn", vmin=vmin, vmax=vmax)
         ax.set_title(name)
-        ax.axis('off')
+        ax.axis("off")
         plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
 
     # Hide unused axes
     for ax in axes[n_indices:]:
-        ax.axis('off')
+        ax.axis("off")
 
     fig.suptitle(title)
     fig.tight_layout()
 
     if save_path:
-        plt.savefig(save_path, dpi=150, bbox_inches='tight')
+        plt.savefig(save_path, dpi=150, bbox_inches="tight")
 
     return fig, axes
 
@@ -428,28 +436,27 @@ def create_prediction_report(
 
     # Generate plots
     plot_class_distribution(
-        predictions,
-        save_path=str(output_path / f"{report_name}_class_dist.png")
+        predictions, save_path=str(output_path / f"{report_name}_class_dist.png")
     )
 
     plot_confidence_histogram(
-        predictions,
-        save_path=str(output_path / f"{report_name}_confidence.png")
+        predictions, save_path=str(output_path / f"{report_name}_confidence.png")
     )
 
     plot_predictions_on_map(
-        predictions, coordinates,
-        save_path=str(output_path / f"{report_name}_map.png")
+        predictions, coordinates, save_path=str(output_path / f"{report_name}_map.png")
     )
 
     # Generate summary text
     from collections import Counter
 
     class_counts = Counter(p.class_name for p in predictions)
-    scd_count = class_counts.get('SCD', 0)
+    scd_count = class_counts.get("SCD", 0)
     total = len(predictions)
 
-    high_conf_scds = sum(1 for p in predictions if p.class_name == 'SCD' and p.confidence > 0.7)
+    high_conf_scds = sum(
+        1 for p in predictions if p.class_name == "SCD" and p.confidence > 0.7
+    )
 
     summary = f"""
 # Prediction Report: {report_name}
@@ -474,7 +481,7 @@ def create_prediction_report(
 
     # Save summary
     summary_path = output_path / f"{report_name}_summary.md"
-    with open(summary_path, 'w') as f:
+    with open(summary_path, "w") as f:
         f.write(summary)
 
     return str(summary_path)

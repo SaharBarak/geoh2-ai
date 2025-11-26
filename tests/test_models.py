@@ -23,7 +23,7 @@ class TestPredictionResult:
                 "SCD": 0.85,
                 "salt_lake": 0.10,
                 "impact_crater": 0.05,
-            }
+            },
         )
 
     def test_is_scd_positive(self, sample_result):
@@ -37,7 +37,7 @@ class TestPredictionResult:
             class_name="salt_lake",
             class_id=7,
             confidence=0.90,
-            probabilities={"salt_lake": 0.90, "SCD": 0.10}
+            probabilities={"salt_lake": 0.90, "SCD": 0.10},
         )
 
         assert result.is_scd(threshold=0.5) is False
@@ -63,12 +63,18 @@ class TestModelConfig:
             architecture="yolov8n",
             num_classes=9,
             class_names=[
-                "SCD", "fairy_circle", "fairy_fort", "farm_circle",
-                "flooded_dune", "impact_crater", "karst", "salt_lake",
-                "thermokarst"
+                "SCD",
+                "fairy_circle",
+                "fairy_fort",
+                "farm_circle",
+                "flooded_dune",
+                "impact_crater",
+                "karst",
+                "salt_lake",
+                "thermokarst",
             ],
             input_size=640,
-            confidence_threshold=0.5
+            confidence_threshold=0.5,
         )
 
     def test_config_creation(self, sample_config):

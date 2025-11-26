@@ -15,6 +15,7 @@ from PIL import Image
 @dataclass
 class DatasetConfig:
     """Configuration for dataset building"""
+
     data_dir: Path
     train_split: float = 0.8
     val_split: float = 0.2
@@ -33,10 +34,7 @@ class DatasetBuilder:
         self.data_dir = Path(config.data_dir)
         np.random.seed(config.seed)
 
-    def create_directory_structure(
-        self,
-        class_names: List[str]
-    ) -> Dict[str, Path]:
+    def create_directory_structure(self, class_names: List[str]) -> Dict[str, Path]:
         """
         Create dataset directory structure.
 
@@ -60,10 +58,7 @@ class DatasetBuilder:
         return dirs
 
     def split_dataset(
-        self,
-        image_paths: List[Path],
-        labels: List[int],
-        stratify: bool = True
+        self, image_paths: List[Path], labels: List[int], stratify: bool = True
     ) -> Tuple[List[Path], List[int], List[Path], List[int]]:
         """
         Split dataset into train/val sets.
@@ -113,9 +108,7 @@ class DatasetBuilder:
         return train_paths, train_labels, val_paths, val_labels
 
     def create_dataset_yaml(
-        self,
-        class_names: List[str],
-        output_path: Optional[Path] = None
+        self, class_names: List[str], output_path: Optional[Path] = None
     ) -> Path:
         """
         Create YAML configuration file for YOLO training.
@@ -135,7 +128,7 @@ class DatasetBuilder:
             "train": "train",
             "val": "val",
             "names": {i: name for i, name in enumerate(class_names)},
-            "nc": len(class_names)
+            "nc": len(class_names),
         }
 
         output_path = Path(output_path)
@@ -153,11 +146,7 @@ class DatasetBuilder:
         Returns:
             Dictionary with dataset statistics
         """
-        stats = {
-            "train": {},
-            "val": {},
-            "total": {}
-        }
+        stats = {"train": {}, "val": {}, "total": {}}
 
         for split in ["train", "val"]:
             split_dir = self.data_dir / split
@@ -167,8 +156,9 @@ class DatasetBuilder:
             for class_dir in split_dir.iterdir():
                 if class_dir.is_dir():
                     class_name = class_dir.name
-                    n_images = len(list(class_dir.glob("*.jpg"))) + \
-                               len(list(class_dir.glob("*.png")))
+                    n_images = len(list(class_dir.glob("*.jpg"))) + len(
+                        list(class_dir.glob("*.png"))
+                    )
                     stats[split][class_name] = n_images
 
                     if class_name not in stats["total"]:

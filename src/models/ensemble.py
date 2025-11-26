@@ -16,10 +16,11 @@ from .base_model import BaseDetectionModel
 
 class AggregationMethod(Enum):
     """Methods for aggregating ensemble predictions."""
-    MEAN = "mean"           # Average probabilities
-    MAX = "max"             # Maximum probability per class
-    VOTING = "voting"       # Majority voting
-    WEIGHTED = "weighted"   # Weighted average
+
+    MEAN = "mean"  # Average probabilities
+    MAX = "max"  # Maximum probability per class
+    VOTING = "voting"  # Majority voting
+    WEIGHTED = "weighted"  # Weighted average
 
 
 class EnsembleModel(BaseDetectionModel):
@@ -166,12 +167,11 @@ class EnsembleModel(BaseDetectionModel):
             metadata={
                 "ensemble_size": len(self.models),
                 "aggregation": self.aggregation.value,
-            }
+            },
         )
 
     def _predict_batch_impl(
-        self,
-        images: List[Union[str, np.ndarray]]
+        self, images: List[Union[str, np.ndarray]]
     ) -> List[PredictionResult]:
         """Batch prediction for ensemble."""
         # Get batch predictions from each model
@@ -206,17 +206,19 @@ class EnsembleModel(BaseDetectionModel):
                 for name, prob in zip(self.config.class_names, aggregated_probs)
             }
 
-            final_results.append(PredictionResult(
-                class_name=class_name,
-                class_id=class_id,
-                confidence=confidence,
-                probabilities=probabilities,
-                image_path=image_path,
-                metadata={
-                    "ensemble_size": len(self.models),
-                    "aggregation": self.aggregation.value,
-                }
-            ))
+            final_results.append(
+                PredictionResult(
+                    class_name=class_name,
+                    class_id=class_id,
+                    confidence=confidence,
+                    probabilities=probabilities,
+                    image_path=image_path,
+                    metadata={
+                        "ensemble_size": len(self.models),
+                        "aggregation": self.aggregation.value,
+                    },
+                )
+            )
 
         return final_results
 

@@ -13,6 +13,7 @@ from scipy import ndimage
 @dataclass
 class MorphometricFeatures:
     """Morphometric features of a structure"""
+
     area: float  # in square meters
     perimeter: float  # in meters
     diameter: float  # in meters
@@ -24,7 +25,7 @@ class MorphometricFeatures:
         self,
         min_diameter: float = 50.0,
         max_diameter: float = 1000.0,
-        min_circularity: float = 0.6
+        min_circularity: float = 0.6,
     ) -> bool:
         """
         Check if morphometry matches SCD criteria.
@@ -65,7 +66,7 @@ class MorphometricAnalyzer:
         pixel_resolution: float = 10.0,  # meters per pixel
         min_diameter_m: float = 50.0,
         max_diameter_m: float = 1000.0,
-        min_circularity: float = 0.6
+        min_circularity: float = 0.6,
     ):
         """
         Initialize analyzer.
@@ -82,9 +83,7 @@ class MorphometricAnalyzer:
         self.min_circularity = min_circularity
 
     def analyze_binary_mask(
-        self,
-        mask: np.ndarray,
-        dem: Optional[np.ndarray] = None
+        self, mask: np.ndarray, dem: Optional[np.ndarray] = None
     ) -> MorphometricFeatures:
         """
         Analyze morphometric features from binary mask.
@@ -98,10 +97,11 @@ class MorphometricAnalyzer:
         """
         # Compute area
         area_pixels = np.sum(mask)
-        area_m2 = area_pixels * (self.pixel_resolution ** 2)
+        area_m2 = area_pixels * (self.pixel_resolution**2)
 
         # Compute perimeter using edge detection
         from scipy import ndimage
+
         eroded = ndimage.binary_erosion(mask)
         boundary = mask.astype(int) - eroded.astype(int)
         perimeter_pixels = np.sum(boundary)
@@ -112,7 +112,7 @@ class MorphometricAnalyzer:
 
         # Compute circularity (4π * area / perimeter^2)
         if perimeter_m > 0:
-            circularity = (4 * np.pi * area_m2) / (perimeter_m ** 2)
+            circularity = (4 * np.pi * area_m2) / (perimeter_m**2)
             circularity = min(circularity, 1.0)  # Clamp to [0, 1]
         else:
             circularity = 0.0
@@ -139,14 +139,10 @@ class MorphometricAnalyzer:
             diameter=diameter_m,
             circularity=circularity,
             elongation=elongation,
-            depth=depth
+            depth=depth,
         )
 
-    def _estimate_depth(
-        self,
-        mask: np.ndarray,
-        dem: np.ndarray
-    ) -> float:
+    def _estimate_depth(self, mask: np.ndarray, dem: np.ndarray) -> float:
         """
         Estimate depression depth from DEM.
 
@@ -162,6 +158,7 @@ class MorphometricAnalyzer:
 
         # Get rim elevations (dilate mask and subtract)
         from scipy.ndimage import binary_dilation
+
         dilated = binary_dilation(mask, iterations=3)
         rim_mask = dilated & ~mask
         outside = dem[rim_mask]
@@ -176,11 +173,7 @@ class MorphometricAnalyzer:
 
         return depth
 
-    def filter_predictions(
-        self,
-        predictions: list,
-        masks: list[np.ndarray]
-    ) -> list:
+    def filter_predictions(self, predictions: list, masks: list[np.ndarray]) -> list:
         """
         Filter predictions based on morphometric criteria.
 
@@ -200,7 +193,7 @@ class MorphometricAnalyzer:
             if features.is_valid_scd(
                 min_diameter=self.min_diameter_m,
                 max_diameter=self.max_diameter_m,
-                min_circularity=self.min_circularity
+                min_circularity=self.min_circularity,
             ):
                 # Add morphometric metadata
                 if pred.metadata is None:

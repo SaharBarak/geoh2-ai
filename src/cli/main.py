@@ -42,7 +42,7 @@ def predict_single(args):
         print(f"  {name:15} {prob:6.2%} {bar}")
 
     if args.output:
-        with open(args.output, 'w') as f:
+        with open(args.output, "w") as f:
             json.dump(result.to_dict(), f, indent=2)
         print(f"\nResults saved to: {args.output}")
 
@@ -80,7 +80,7 @@ def predict_batch(args):
     # Process in batches
     results = []
     for i in tqdm(range(0, len(images), args.batch_size)):
-        batch = images[i:i + args.batch_size]
+        batch = images[i : i + args.batch_size]
         batch_results = model.predict_batch(batch)
         results.extend(batch_results)
 
@@ -96,6 +96,7 @@ def predict_batch(args):
 
     # Class distribution
     from collections import Counter
+
     class_dist = Counter(r.class_name for r in results)
     print("\nClass Distribution:")
     for name, count in class_dist.most_common():
@@ -111,18 +112,18 @@ def predict_batch(args):
                 "threshold": args.threshold,
             },
             "predictions": [
-                {**r.to_dict(), "image": img}
-                for r, img in zip(results, images)
-            ]
+                {**r.to_dict(), "image": img} for r, img in zip(results, images)
+            ],
         }
 
-        with open(args.output, 'w') as f:
+        with open(args.output, "w") as f:
             json.dump(output_data, f, indent=2)
         print(f"\nResults saved to: {args.output}")
 
     # List high-confidence SCDs
     high_conf_scds = [
-        (img, r) for img, r in zip(images, results)
+        (img, r)
+        for img, r in zip(images, results)
         if r.is_scd(args.threshold) and r.confidence > 0.7
     ]
 
@@ -203,7 +204,7 @@ def calculate_indices(args):
         bands = {}
         band_names = ["B2", "B3", "B4", "B8", "B11", "B12"]
 
-        for i, name in enumerate(band_names[:src.count]):
+        for i, name in enumerate(band_names[: src.count]):
             bands[name] = src.read(i + 1).astype(np.float32)
 
         profile = src.profile
@@ -218,7 +219,9 @@ def calculate_indices(args):
 
     print(f"\nComputed indices:")
     for name, result in results.items():
-        print(f"  {name}: mean={np.nanmean(result.value):.4f}, range={result.valid_range}")
+        print(
+            f"  {name}: mean={np.nanmean(result.value):.4f}, range={result.valid_range}"
+        )
 
     # Save results
     if args.output:
@@ -233,7 +236,7 @@ def calculate_indices(args):
                 count=1,
             )
 
-            with rasterio.open(out_file, 'w', **profile) as dst:
+            with rasterio.open(out_file, "w", **profile) as dst:
                 dst.write(result.value, 1)
 
             print(f"Saved: {out_file}")
@@ -274,7 +277,7 @@ Examples:
 
   # Start API server
   h2detect serve --port 8000
-        """
+        """,
     )
 
     subparsers = parser.add_subparsers(dest="command", help="Commands")

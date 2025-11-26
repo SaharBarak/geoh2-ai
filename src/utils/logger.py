@@ -13,7 +13,7 @@ def setup_logger(
     name: str = "h2_seep_detection",
     level: int = logging.INFO,
     log_file: Optional[Path] = None,
-    log_to_console: bool = True
+    log_to_console: bool = True,
 ) -> logging.Logger:
     """
     Setup logger with file and console handlers.
@@ -35,8 +35,8 @@ def setup_logger(
 
     # Create formatter
     formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S'
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
     )
 
     # Console handler

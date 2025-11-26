@@ -14,6 +14,7 @@ import numpy as np
 @dataclass
 class AugmentationConfig:
     """Configuration for augmentation pipeline."""
+
     horizontal_flip: float = 0.5
     vertical_flip: float = 0.5
     rotation_limit: int = 45
@@ -53,6 +54,7 @@ class Augmentor:
         """Check if Albumentations is available."""
         try:
             import albumentations
+
             return True
         except ImportError:
             return False
@@ -89,42 +91,52 @@ class Augmentor:
 
         # Rotation
         if self.config.rotation_prob > 0:
-            transforms.append(A.Rotate(
-                limit=self.config.rotation_limit,
-                p=self.config.rotation_prob,
-                border_mode=0,  # cv2.BORDER_CONSTANT
-            ))
+            transforms.append(
+                A.Rotate(
+                    limit=self.config.rotation_limit,
+                    p=self.config.rotation_prob,
+                    border_mode=0,  # cv2.BORDER_CONSTANT
+                )
+            )
 
         # Brightness/Contrast
         if self.config.brightness_contrast_prob > 0:
-            transforms.append(A.RandomBrightnessContrast(
-                brightness_limit=self.config.brightness_limit,
-                contrast_limit=self.config.contrast_limit,
-                p=self.config.brightness_contrast_prob,
-            ))
+            transforms.append(
+                A.RandomBrightnessContrast(
+                    brightness_limit=self.config.brightness_limit,
+                    contrast_limit=self.config.contrast_limit,
+                    p=self.config.brightness_contrast_prob,
+                )
+            )
 
         # Color jitter
         if self.config.color_jitter_prob > 0:
-            transforms.append(A.HueSaturationValue(
-                hue_shift_limit=self.config.hue_shift,
-                sat_shift_limit=self.config.saturation_shift,
-                val_shift_limit=20,
-                p=self.config.color_jitter_prob,
-            ))
+            transforms.append(
+                A.HueSaturationValue(
+                    hue_shift_limit=self.config.hue_shift,
+                    sat_shift_limit=self.config.saturation_shift,
+                    val_shift_limit=20,
+                    p=self.config.color_jitter_prob,
+                )
+            )
 
         # Blur
         if self.config.blur_prob > 0:
-            transforms.append(A.GaussianBlur(
-                blur_limit=self.config.blur_limit,
-                p=self.config.blur_prob,
-            ))
+            transforms.append(
+                A.GaussianBlur(
+                    blur_limit=self.config.blur_limit,
+                    p=self.config.blur_prob,
+                )
+            )
 
         # Noise
         if self.config.noise_prob > 0:
-            transforms.append(A.GaussNoise(
-                var_limit=(0, self.config.noise_var * 255 * 255),
-                p=self.config.noise_prob,
-            ))
+            transforms.append(
+                A.GaussNoise(
+                    var_limit=(0, self.config.noise_var * 255 * 255),
+                    p=self.config.noise_prob,
+                )
+            )
 
         transform = A.Compose(transforms)
 
@@ -135,6 +147,7 @@ class Augmentor:
 
     def _create_numpy_transform(self) -> Callable:
         """Create NumPy-based transform pipeline (fallback)."""
+
         def apply_transform(image: np.ndarray) -> np.ndarray:
             img = image.copy()
 
@@ -154,8 +167,7 @@ class Augmentor:
             # Brightness
             if np.random.random() < self.config.brightness_contrast_prob:
                 factor = 1.0 + np.random.uniform(
-                    -self.config.brightness_limit,
-                    self.config.brightness_limit
+                    -self.config.brightness_limit, self.config.brightness_limit
                 )
                 img = np.clip(img * factor, 0, 255).astype(np.uint8)
 

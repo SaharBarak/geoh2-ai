@@ -14,6 +14,7 @@ import numpy as np
 @dataclass
 class BoundingBox:
     """Geographic bounding box."""
+
     min_lon: float
     min_lat: float
     max_lon: float
@@ -22,10 +23,7 @@ class BoundingBox:
     @property
     def center(self) -> Tuple[float, float]:
         """Get center point (lon, lat)."""
-        return (
-            (self.min_lon + self.max_lon) / 2,
-            (self.min_lat + self.max_lat) / 2
-        )
+        return ((self.min_lon + self.max_lon) / 2, (self.min_lat + self.max_lat) / 2)
 
     @property
     def width(self) -> float:
@@ -40,11 +38,10 @@ class BoundingBox:
     def contains(self, lon: float, lat: float) -> bool:
         """Check if point is within bounding box."""
         return (
-            self.min_lon <= lon <= self.max_lon and
-            self.min_lat <= lat <= self.max_lat
+            self.min_lon <= lon <= self.max_lon and self.min_lat <= lat <= self.max_lat
         )
 
-    def expand(self, factor: float) -> 'BoundingBox':
+    def expand(self, factor: float) -> "BoundingBox":
         """Expand bounding box by factor."""
         center_lon, center_lat = self.center
         half_width = self.width / 2 * factor
@@ -178,9 +175,7 @@ class CoordinateHandler:
             BoundingBox object
         """
         if not self.validate_coordinates(center_lon, center_lat):
-            raise ValueError(
-                f"Invalid coordinates: ({center_lon}, {center_lat})"
-            )
+            raise ValueError(f"Invalid coordinates: ({center_lon}, {center_lat})")
 
         height_meters = height_meters or width_meters
 
@@ -220,8 +215,8 @@ class CoordinateHandler:
         dlon = np.radians(lon2 - lon1)
 
         a = (
-            np.sin(dlat / 2) ** 2 +
-            np.cos(lat1_rad) * np.cos(lat2_rad) * np.sin(dlon / 2) ** 2
+            np.sin(dlat / 2) ** 2
+            + np.cos(lat1_rad) * np.cos(lat2_rad) * np.sin(dlon / 2) ** 2
         )
         c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
 
@@ -318,8 +313,8 @@ class CoordinateHandler:
         coord_string = coord_string.strip()
 
         # Try simple comma-separated
-        if re.match(r'^-?\d+\.?\d*,\s*-?\d+\.?\d*$', coord_string):
-            parts = coord_string.split(',')
+        if re.match(r"^-?\d+\.?\d*,\s*-?\d+\.?\d*$", coord_string):
+            parts = coord_string.split(",")
             a, b = float(parts[0].strip()), float(parts[1].strip())
 
             # Assume lat, lon order if first is in lat range
@@ -335,13 +330,13 @@ class CoordinateHandler:
             coords = []
             for d, m, s, direction in matches:
                 decimal = float(d) + float(m) / 60 + float(s) / 3600
-                if direction.upper() in ['S', 'W']:
+                if direction.upper() in ["S", "W"]:
                     decimal = -decimal
                 coords.append((decimal, direction.upper()))
 
             # Determine which is lat/lon
-            lat = next(c[0] for c in coords if c[1] in ['N', 'S'])
-            lon = next(c[0] for c in coords if c[1] in ['E', 'W'])
+            lat = next(c[0] for c in coords if c[1] in ["N", "S"])
+            lon = next(c[0] for c in coords if c[1] in ["E", "W"])
             return (lon, lat)
 
         raise ValueError(f"Could not parse coordinate string: {coord_string}")
@@ -367,6 +362,7 @@ class CoordinateHandler:
             return f"{lat:.6f}, {lon:.6f}"
 
         elif format == "dms":
+
             def to_dms(val, directions):
                 direction = directions[0] if val >= 0 else directions[1]
                 val = abs(val)
@@ -375,11 +371,12 @@ class CoordinateHandler:
                 s = (val - d - m / 60) * 3600
                 return f"{d}°{m}'{s:.2f}\"{direction}"
 
-            lat_str = to_dms(lat, ('N', 'S'))
-            lon_str = to_dms(lon, ('E', 'W'))
+            lat_str = to_dms(lat, ("N", "S"))
+            lon_str = to_dms(lon, ("E", "W"))
             return f"{lat_str}, {lon_str}"
 
         elif format == "dm":
+
             def to_dm(val, directions):
                 direction = directions[0] if val >= 0 else directions[1]
                 val = abs(val)
@@ -387,8 +384,8 @@ class CoordinateHandler:
                 m = (val - d) * 60
                 return f"{d}°{m:.4f}'{direction}"
 
-            lat_str = to_dm(lat, ('N', 'S'))
-            lon_str = to_dm(lon, ('E', 'W'))
+            lat_str = to_dm(lat, ("N", "S"))
+            lon_str = to_dm(lon, ("E", "W"))
             return f"{lat_str}, {lon_str}"
 
         else:

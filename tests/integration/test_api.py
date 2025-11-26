@@ -66,7 +66,7 @@ class TestAPIIntegration:
         # Test with non-image file
         response = client.post(
             "/api/v1/predict",
-            files={"file": ("test.txt", b"not an image", "text/plain")}
+            files={"file": ("test.txt", b"not an image", "text/plain")},
         )
         # 400 if validation fails, 503 if model not loaded
         assert response.status_code in [400, 503]

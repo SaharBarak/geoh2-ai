@@ -13,16 +13,17 @@ import numpy as np
 
 class SpectralBand(Enum):
     """Sentinel-2 spectral bands."""
-    B1 = "B1"    # Coastal aerosol (60m)
-    B2 = "B2"    # Blue (10m)
-    B3 = "B3"    # Green (10m)
-    B4 = "B4"    # Red (10m)
-    B5 = "B5"    # Vegetation Red Edge (20m)
-    B6 = "B6"    # Vegetation Red Edge (20m)
-    B7 = "B7"    # Vegetation Red Edge (20m)
-    B8 = "B8"    # NIR (10m)
+
+    B1 = "B1"  # Coastal aerosol (60m)
+    B2 = "B2"  # Blue (10m)
+    B3 = "B3"  # Green (10m)
+    B4 = "B4"  # Red (10m)
+    B5 = "B5"  # Vegetation Red Edge (20m)
+    B6 = "B6"  # Vegetation Red Edge (20m)
+    B7 = "B7"  # Vegetation Red Edge (20m)
+    B8 = "B8"  # NIR (10m)
     B8A = "B8A"  # Vegetation Red Edge (20m)
-    B9 = "B9"    # Water Vapour (60m)
+    B9 = "B9"  # Water Vapour (60m)
     B10 = "B10"  # SWIR - Cirrus (60m)
     B11 = "B11"  # SWIR (20m)
     B12 = "B12"  # SWIR (20m)
@@ -31,6 +32,7 @@ class SpectralBand(Enum):
 @dataclass
 class IndexResult:
     """Result of spectral index computation."""
+
     name: str
     value: np.ndarray
     valid_range: Tuple[float, float]

@@ -110,7 +110,9 @@ class BaseDetectionModel(ABC):
 
         return img
 
-    def postprocess(self, output: np.ndarray, image_path: Optional[str] = None) -> PredictionResult:
+    def postprocess(
+        self, output: np.ndarray, image_path: Optional[str] = None
+    ) -> PredictionResult:
         """
         Convert model output to PredictionResult.
 
@@ -138,8 +140,7 @@ class BaseDetectionModel(ABC):
 
         # Build probability dictionary
         probabilities = {
-            name: float(prob)
-            for name, prob in zip(self.config.class_names, probs)
+            name: float(prob) for name, prob in zip(self.config.class_names, probs)
         }
 
         return PredictionResult(
@@ -171,9 +172,7 @@ class BaseDetectionModel(ABC):
         return result
 
     def predict_batch(
-        self,
-        images: List[Union[str, Path, np.ndarray]],
-        batch_size: int = 16
+        self, images: List[Union[str, Path, np.ndarray]], batch_size: int = 16
     ) -> List[PredictionResult]:
         """
         Run prediction on a batch of images.
@@ -188,15 +187,14 @@ class BaseDetectionModel(ABC):
         results = []
 
         for i in range(0, len(images), batch_size):
-            batch = images[i:i + batch_size]
+            batch = images[i : i + batch_size]
             batch_results = self._predict_batch_impl(batch)
             results.extend(batch_results)
 
         return results
 
     def _predict_batch_impl(
-        self,
-        images: List[Union[str, Path, np.ndarray]]
+        self, images: List[Union[str, Path, np.ndarray]]
     ) -> List[PredictionResult]:
         """
         Implementation of batch prediction.

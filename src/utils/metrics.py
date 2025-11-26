@@ -24,7 +24,7 @@ def compute_metrics(
     y_true: List[int],
     y_pred: List[int],
     y_prob: Optional[np.ndarray] = None,
-    class_names: Optional[List[str]] = None
+    class_names: Optional[List[str]] = None,
 ) -> Dict:
     """
     Compute comprehensive classification metrics.
@@ -54,10 +54,7 @@ def compute_metrics(
     # Per-class detailed metrics
     if class_names:
         report = classification_report(
-            y_true, y_pred,
-            target_names=class_names,
-            output_dict=True,
-            zero_division=0
+            y_true, y_pred, target_names=class_names, output_dict=True, zero_division=0
         )
         metrics["per_class"] = report
 
@@ -86,7 +83,7 @@ def plot_confusion_matrix(
     normalize: bool = False,
     title: str = "Confusion Matrix",
     figsize: tuple = (10, 8),
-    save_path: Optional[str] = None
+    save_path: Optional[str] = None,
 ) -> plt.Figure:
     """
     Plot confusion matrix using seaborn.
@@ -103,10 +100,10 @@ def plot_confusion_matrix(
         Matplotlib figure
     """
     if normalize:
-        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-        fmt = '.2f'
+        cm = cm.astype("float") / cm.sum(axis=1)[:, np.newaxis]
+        fmt = ".2f"
     else:
-        fmt = 'd'
+        fmt = "d"
 
     fig, ax = plt.subplots(figsize=figsize)
 
@@ -114,21 +111,21 @@ def plot_confusion_matrix(
         cm,
         annot=True,
         fmt=fmt,
-        cmap='Blues',
+        cmap="Blues",
         xticklabels=class_names,
         yticklabels=class_names,
-        cbar_kws={'label': 'Count' if not normalize else 'Proportion'},
-        ax=ax
+        cbar_kws={"label": "Count" if not normalize else "Proportion"},
+        ax=ax,
     )
 
     ax.set_title(title, fontsize=14, pad=20)
-    ax.set_ylabel('True Label', fontsize=12)
-    ax.set_xlabel('Predicted Label', fontsize=12)
+    ax.set_ylabel("True Label", fontsize=12)
+    ax.set_xlabel("Predicted Label", fontsize=12)
 
     plt.tight_layout()
 
     if save_path:
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        plt.savefig(save_path, dpi=300, bbox_inches="tight")
 
     return fig
 
@@ -137,7 +134,7 @@ def plot_roc_curve(
     y_true: np.ndarray,
     y_prob: np.ndarray,
     title: str = "ROC Curve",
-    save_path: Optional[str] = None
+    save_path: Optional[str] = None,
 ) -> plt.Figure:
     """
     Plot ROC curve for binary classification.
@@ -156,13 +153,13 @@ def plot_roc_curve(
 
     fig, ax = plt.subplots(figsize=(8, 6))
 
-    ax.plot(fpr, tpr, linewidth=2, label=f'ROC curve (AUC = {roc_auc:.2f})')
-    ax.plot([0, 1], [0, 1], 'k--', linewidth=1, label='Random classifier')
+    ax.plot(fpr, tpr, linewidth=2, label=f"ROC curve (AUC = {roc_auc:.2f})")
+    ax.plot([0, 1], [0, 1], "k--", linewidth=1, label="Random classifier")
 
     ax.set_xlim([0.0, 1.0])
     ax.set_ylim([0.0, 1.05])
-    ax.set_xlabel('False Positive Rate', fontsize=12)
-    ax.set_ylabel('True Positive Rate', fontsize=12)
+    ax.set_xlabel("False Positive Rate", fontsize=12)
+    ax.set_ylabel("True Positive Rate", fontsize=12)
     ax.set_title(title, fontsize=14)
     ax.legend(loc="lower right")
     ax.grid(alpha=0.3)
@@ -170,7 +167,7 @@ def plot_roc_curve(
     plt.tight_layout()
 
     if save_path:
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        plt.savefig(save_path, dpi=300, bbox_inches="tight")
 
     return fig
 
@@ -179,7 +176,7 @@ def plot_class_distribution(
     y: List[int],
     class_names: List[str],
     title: str = "Class Distribution",
-    save_path: Optional[str] = None
+    save_path: Optional[str] = None,
 ) -> plt.Figure:
     """
     Plot distribution of classes.
@@ -197,23 +194,27 @@ def plot_class_distribution(
 
     fig, ax = plt.subplots(figsize=(12, 6))
 
-    bars = ax.bar(range(len(unique)), counts, color='steelblue', alpha=0.7)
+    bars = ax.bar(range(len(unique)), counts, color="steelblue", alpha=0.7)
     ax.set_xticks(range(len(unique)))
-    ax.set_xticklabels([class_names[i] for i in unique], rotation=45, ha='right')
-    ax.set_ylabel('Count', fontsize=12)
+    ax.set_xticklabels([class_names[i] for i in unique], rotation=45, ha="right")
+    ax.set_ylabel("Count", fontsize=12)
     ax.set_title(title, fontsize=14)
-    ax.grid(axis='y', alpha=0.3)
+    ax.grid(axis="y", alpha=0.3)
 
     # Add value labels on bars
     for bar, count in zip(bars, counts):
         height = bar.get_height()
-        ax.text(bar.get_x() + bar.get_width()/2., height,
-                f'{count}',
-                ha='center', va='bottom')
+        ax.text(
+            bar.get_x() + bar.get_width() / 2.0,
+            height,
+            f"{count}",
+            ha="center",
+            va="bottom",
+        )
 
     plt.tight_layout()
 
     if save_path:
-        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        plt.savefig(save_path, dpi=300, bbox_inches="tight")
 
     return fig

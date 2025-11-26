@@ -21,8 +21,10 @@ router = APIRouter()
 # Request/Response Models
 # ============================================================================
 
+
 class PredictionResponse(BaseModel):
     """Response model for predictions."""
+
     class_name: str
     class_id: int
     confidence: float
@@ -33,6 +35,7 @@ class PredictionResponse(BaseModel):
 
 class BatchPredictionResponse(BaseModel):
     """Response model for batch predictions."""
+
     predictions: List[PredictionResponse]
     total: int
     scd_count: int
@@ -41,17 +44,20 @@ class BatchPredictionResponse(BaseModel):
 
 class SpectralIndexRequest(BaseModel):
     """Request model for spectral index calculation."""
+
     indices: List[str] = Field(default=["ndvi", "bi"])
 
 
 class SpectralIndexResponse(BaseModel):
     """Response model for spectral indices."""
+
     indices: dict
     metadata: dict
 
 
 class CoordinateRequest(BaseModel):
     """Request model with coordinates."""
+
     longitude: float = Field(..., ge=-180, le=180)
     latitude: float = Field(..., ge=-90, le=90)
     width_meters: float = Field(default=640, ge=100, le=10000)
@@ -59,6 +65,7 @@ class CoordinateRequest(BaseModel):
 
 class HealthResponse(BaseModel):
     """Health check response."""
+
     status: str
     model_loaded: bool
     model_name: Optional[str] = None
@@ -68,6 +75,7 @@ class HealthResponse(BaseModel):
 # ============================================================================
 # Endpoints
 # ============================================================================
+
 
 @router.get("/health", response_model=HealthResponse)
 async def health_check():
@@ -198,14 +206,16 @@ async def predict_batch(
             if is_scd:
                 scd_count += 1
 
-            predictions.append(PredictionResponse(
-                class_name=result.class_name,
-                class_id=result.class_id,
-                confidence=result.confidence,
-                probabilities=result.probabilities,
-                is_scd=is_scd,
-                image_path=filename,
-            ))
+            predictions.append(
+                PredictionResponse(
+                    class_name=result.class_name,
+                    class_id=result.class_id,
+                    confidence=result.confidence,
+                    probabilities=result.probabilities,
+                    is_scd=is_scd,
+                    image_path=filename,
+                )
+            )
 
         elapsed_ms = (time.time() - start_time) * 1000
 
@@ -357,7 +367,7 @@ async def calculate_spectral_indices(
             metadata={
                 "computed_indices": list(results.keys()),
                 "available_bands": list(bands.keys()),
-            }
+            },
         )
 
     except Exception as e:

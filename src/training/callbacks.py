@@ -118,21 +118,21 @@ class EarlyStoppingCallback(Callback):
         self.mode = mode
         self.restore_best_weights = restore_best_weights
 
-        self.best_value = float('-inf') if mode == "max" else float('inf')
+        self.best_value = float("-inf") if mode == "max" else float("inf")
         self.best_weights = None
         self.counter = 0
         self.should_stop = False
 
     def on_train_begin(self, logs: Dict) -> None:
         """Reset state at training start."""
-        self.best_value = float('-inf') if self.mode == "max" else float('inf')
+        self.best_value = float("-inf") if self.mode == "max" else float("inf")
         self.best_weights = None
         self.counter = 0
         self.should_stop = False
 
     def on_epoch_end(self, logs: Dict) -> None:
         """Check for improvement at epoch end."""
-        current = logs.get(self.monitor, logs.get('val_accuracy', 0))
+        current = logs.get(self.monitor, logs.get("val_accuracy", 0))
 
         if self._is_improvement(current):
             self.best_value = current
@@ -146,7 +146,9 @@ class EarlyStoppingCallback(Callback):
 
             if self.counter >= self.patience:
                 self.should_stop = True
-                print(f"\nEarly stopping triggered after {self.counter} epochs without improvement")
+                print(
+                    f"\nEarly stopping triggered after {self.counter} epochs without improvement"
+                )
 
                 if self.restore_best_weights:
                     self._restore_weights()
@@ -160,12 +162,13 @@ class EarlyStoppingCallback(Callback):
 
     def _save_weights(self) -> None:
         """Save current weights."""
-        if self.trainer and hasattr(self.trainer, 'model'):
+        if self.trainer and hasattr(self.trainer, "model"):
             try:
                 import torch
+
                 self.best_weights = {
-                    k: v.clone() for k, v in
-                    self.trainer.model._model.state_dict().items()
+                    k: v.clone()
+                    for k, v in self.trainer.model._model.state_dict().items()
                 }
             except Exception:
                 pass
@@ -215,22 +218,23 @@ class CheckpointCallback(Callback):
         self.save_frequency = save_frequency
         self.filename_prefix = filename_prefix
 
-        self.best_value = float('-inf') if mode == "max" else float('inf')
+        self.best_value = float("-inf") if mode == "max" else float("inf")
 
     def on_train_begin(self, logs: Dict) -> None:
         """Create save directory."""
         self.save_dir.mkdir(parents=True, exist_ok=True)
-        self.best_value = float('-inf') if self.mode == "max" else float('inf')
+        self.best_value = float("-inf") if self.mode == "max" else float("inf")
 
     def on_epoch_end(self, logs: Dict) -> None:
         """Save checkpoint at epoch end."""
-        epoch = logs.get('epoch', 0)
-        current = logs.get(self.monitor, logs.get('val_accuracy', 0))
+        epoch = logs.get("epoch", 0)
+        current = logs.get(self.monitor, logs.get("val_accuracy", 0))
 
         # Check if should save
         if self.save_best_only:
             is_improvement = (
-                current > self.best_value if self.mode == "max"
+                current > self.best_value
+                if self.mode == "max"
                 else current < self.best_value
             )
 
@@ -248,7 +252,7 @@ class CheckpointCallback(Callback):
         is_best: bool,
     ) -> None:
         """Save model checkpoint."""
-        if not self.trainer or not hasattr(self.trainer, 'model'):
+        if not self.trainer or not hasattr(self.trainer, "model"):
             return
 
         try:
@@ -263,11 +267,14 @@ class CheckpointCallback(Callback):
 
             filepath = self.save_dir / filename
 
-            torch.save({
-                'epoch': epoch,
-                'model_state_dict': model.state_dict(),
-                f'{self.monitor}': metric_value,
-            }, filepath)
+            torch.save(
+                {
+                    "epoch": epoch,
+                    "model_state_dict": model.state_dict(),
+                    f"{self.monitor}": metric_value,
+                },
+                filepath,
+            )
 
             print(f"Saved checkpoint: {filepath}")
 
@@ -328,7 +335,7 @@ class TensorBoardCallback(Callback):
         if not self.writer:
             return
 
-        epoch = logs.get('epoch', 0)
+        epoch = logs.get("epoch", 0)
 
         # Log scalar metrics
         for key, value in logs.items():
@@ -343,7 +350,7 @@ class TensorBoardCallback(Callback):
         self._global_step += 1
 
         if self._global_step % self.log_frequency == 0:
-            loss = logs.get('loss', 0)
+            loss = logs.get("loss", 0)
             self.writer.add_scalar("train/batch_loss", loss, self._global_step)
 
 
@@ -368,11 +375,12 @@ class ProgressCallback(Callback):
 
     def on_train_begin(self, logs: Dict) -> None:
         """Initialize progress bars."""
-        epochs = logs.get('epochs', 0)
+        epochs = logs.get("epochs", 0)
 
         if self.use_tqdm:
             try:
                 from tqdm import tqdm
+
                 self.epoch_pbar = tqdm(
                     total=epochs,
                     desc="Training",
@@ -388,7 +396,7 @@ class ProgressCallback(Callback):
         if self.epoch_pbar:
             self.epoch_pbar.close()
 
-        result = logs.get('result')
+        result = logs.get("result")
         if result:
             print(f"\nTraining complete!")
             print(f"Best accuracy: {result.best_accuracy:.2%}")
@@ -396,16 +404,18 @@ class ProgressCallback(Callback):
 
     def on_epoch_end(self, logs: Dict) -> None:
         """Update progress at epoch end."""
-        epoch = logs.get('epoch', 0)
-        train_loss = logs.get('train_loss', 0)
-        val_accuracy = logs.get('val_accuracy', 0)
+        epoch = logs.get("epoch", 0)
+        train_loss = logs.get("train_loss", 0)
+        val_accuracy = logs.get("val_accuracy", 0)
 
         if self.epoch_pbar:
             self.epoch_pbar.update(1)
-            self.epoch_pbar.set_postfix({
-                'loss': f'{train_loss:.4f}',
-                'acc': f'{val_accuracy:.2%}',
-            })
+            self.epoch_pbar.set_postfix(
+                {
+                    "loss": f"{train_loss:.4f}",
+                    "acc": f"{val_accuracy:.2%}",
+                }
+            )
         else:
             print(
                 f"Epoch {epoch + 1}: "

@@ -15,6 +15,7 @@ import yaml
 @dataclass
 class TrainingConfig:
     """Configuration for training."""
+
     epochs: int = 50
     batch_size: int = 16
     learning_rate: float = 0.001
@@ -29,31 +30,32 @@ class TrainingConfig:
     seed: int = 42
 
     @classmethod
-    def from_yaml(cls, yaml_path: str) -> 'TrainingConfig':
+    def from_yaml(cls, yaml_path: str) -> "TrainingConfig":
         """Load config from YAML file."""
-        with open(yaml_path, 'r') as f:
+        with open(yaml_path, "r") as f:
             config = yaml.safe_load(f)
 
-        training = config.get('training', {})
+        training = config.get("training", {})
         return cls(
-            epochs=training.get('epochs', 50),
-            batch_size=training.get('batch_size', 16),
-            learning_rate=training.get('learning_rate', 0.001),
-            patience=training.get('patience', 10),
-            optimizer=training.get('optimizer', 'adamw'),
-            weight_decay=training.get('weight_decay', 0.0005),
-            warmup_epochs=training.get('warmup_epochs', 3),
-            amp=training.get('amp', True),
-            save_dir=config.get('checkpointing', {}).get('save_dir', 'runs/train'),
-            device=config.get('hardware', {}).get('device', 'auto'),
-            workers=config.get('dataset', {}).get('workers', 8),
-            seed=config.get('reproducibility', {}).get('seed', 42),
+            epochs=training.get("epochs", 50),
+            batch_size=training.get("batch_size", 16),
+            learning_rate=training.get("learning_rate", 0.001),
+            patience=training.get("patience", 10),
+            optimizer=training.get("optimizer", "adamw"),
+            weight_decay=training.get("weight_decay", 0.0005),
+            warmup_epochs=training.get("warmup_epochs", 3),
+            amp=training.get("amp", True),
+            save_dir=config.get("checkpointing", {}).get("save_dir", "runs/train"),
+            device=config.get("hardware", {}).get("device", "auto"),
+            workers=config.get("dataset", {}).get("workers", 8),
+            seed=config.get("reproducibility", {}).get("seed", 42),
         )
 
 
 @dataclass
 class TrainingResult:
     """Result from training run."""
+
     best_accuracy: float
     final_accuracy: float
     epochs_trained: int
@@ -118,6 +120,7 @@ class Trainer:
 
         try:
             import torch
+
             torch.manual_seed(seed)
             if torch.cuda.is_available():
                 torch.cuda.manual_seed_all(seed)
@@ -129,7 +132,7 @@ class Trainer:
         data_yaml: str,
         epochs: Optional[int] = None,
         batch_size: Optional[int] = None,
-        **kwargs
+        **kwargs,
     ) -> TrainingResult:
         """
         Train the model.
@@ -151,11 +154,14 @@ class Trainer:
 
         # Notify training start
         self._is_training = True
-        self._notify('train_begin', {
-            'epochs': epochs,
-            'batch_size': batch_size,
-            'config': self.config,
-        })
+        self._notify(
+            "train_begin",
+            {
+                "epochs": epochs,
+                "batch_size": batch_size,
+                "config": self.config,
+            },
+        )
 
         try:
             # Use model's built-in training (YOLOv8)
@@ -166,14 +172,14 @@ class Trainer:
                 learning_rate=self.config.learning_rate,
                 patience=self.config.patience,
                 save_dir=self.config.save_dir,
-                **kwargs
+                **kwargs,
             )
 
             # Extract metrics
-            best_accuracy = results.get('metrics', {}).get('accuracy', 0)
-            best_weights = results.get('best_weights', '')
-            last_weights = results.get('last_weights', '')
-            save_dir = results.get('save_dir', self.config.save_dir)
+            best_accuracy = results.get("metrics", {}).get("accuracy", 0)
+            best_weights = results.get("best_weights", "")
+            last_weights = results.get("last_weights", "")
+            save_dir = results.get("save_dir", self.config.save_dir)
 
             training_result = TrainingResult(
                 best_accuracy=best_accuracy,
@@ -187,14 +193,17 @@ class Trainer:
             )
 
             # Notify training end
-            self._notify('train_end', {
-                'result': training_result,
-            })
+            self._notify(
+                "train_end",
+                {
+                    "result": training_result,
+                },
+            )
 
             return training_result
 
         except Exception as e:
-            self._notify('train_error', {'error': str(e)})
+            self._notify("train_error", {"error": str(e)})
             raise
 
         finally:
@@ -227,9 +236,9 @@ class Trainer:
         self._best_epoch = 0
 
         metrics_history = {
-            'train_loss': [],
-            'val_loss': [],
-            'val_accuracy': [],
+            "train_loss": [],
+            "val_loss": [],
+            "val_accuracy": [],
         }
 
         # Setup
@@ -240,7 +249,7 @@ class Trainer:
         criterion = torch.nn.CrossEntropyLoss()
 
         # Notify start
-        self._notify('train_begin', {'epochs': epochs})
+        self._notify("train_begin", {"epochs": epochs})
 
         save_dir = Path(self.config.save_dir)
         save_dir.mkdir(parents=True, exist_ok=True)
@@ -250,7 +259,7 @@ class Trainer:
                 self._current_epoch = epoch
 
                 # Notify epoch start
-                self._notify('epoch_begin', {'epoch': epoch})
+                self._notify("epoch_begin", {"epoch": epoch})
 
                 # Training phase
                 model.train()
@@ -271,61 +280,64 @@ class Trainer:
                     num_batches += 1
 
                     # Notify batch end
-                    self._notify('batch_end', {
-                        'batch': batch_idx,
-                        'loss': loss.item(),
-                    })
+                    self._notify(
+                        "batch_end",
+                        {
+                            "batch": batch_idx,
+                            "loss": loss.item(),
+                        },
+                    )
 
                 avg_train_loss = train_loss / max(num_batches, 1)
-                metrics_history['train_loss'].append(avg_train_loss)
+                metrics_history["train_loss"].append(avg_train_loss)
 
                 # Validation phase
                 val_loss, val_accuracy = self._validate_epoch(
                     model, val_loader, criterion, device
                 )
-                metrics_history['val_loss'].append(val_loss)
-                metrics_history['val_accuracy'].append(val_accuracy)
+                metrics_history["val_loss"].append(val_loss)
+                metrics_history["val_accuracy"].append(val_accuracy)
 
                 # Update best
                 if val_accuracy > self._best_metric:
                     self._best_metric = val_accuracy
                     self._best_epoch = epoch
-                    torch.save(
-                        model.state_dict(),
-                        save_dir / 'best.pt'
-                    )
+                    torch.save(model.state_dict(), save_dir / "best.pt")
 
                 # Scheduler step
                 if scheduler:
                     scheduler.step()
 
                 # Notify epoch end
-                self._notify('epoch_end', {
-                    'epoch': epoch,
-                    'train_loss': avg_train_loss,
-                    'val_loss': val_loss,
-                    'val_accuracy': val_accuracy,
-                })
+                self._notify(
+                    "epoch_end",
+                    {
+                        "epoch": epoch,
+                        "train_loss": avg_train_loss,
+                        "val_loss": val_loss,
+                        "val_accuracy": val_accuracy,
+                    },
+                )
 
                 # Check early stopping
                 if self._should_stop():
                     break
 
             # Save last model
-            torch.save(model.state_dict(), save_dir / 'last.pt')
+            torch.save(model.state_dict(), save_dir / "last.pt")
 
             result = TrainingResult(
                 best_accuracy=self._best_metric,
-                final_accuracy=metrics_history['val_accuracy'][-1],
+                final_accuracy=metrics_history["val_accuracy"][-1],
                 epochs_trained=self._current_epoch + 1,
                 best_epoch=self._best_epoch,
-                best_weights_path=str(save_dir / 'best.pt'),
-                last_weights_path=str(save_dir / 'last.pt'),
+                best_weights_path=str(save_dir / "best.pt"),
+                last_weights_path=str(save_dir / "last.pt"),
                 metrics_history=metrics_history,
                 save_dir=str(save_dir),
             )
 
-            self._notify('train_end', {'result': result})
+            self._notify("train_end", {"result": result})
             return result
 
         finally:
@@ -419,7 +431,7 @@ class Trainer:
     def _should_stop(self) -> bool:
         """Check if training should stop (early stopping)."""
         for callback in self.callbacks:
-            if hasattr(callback, 'should_stop') and callback.should_stop:
+            if hasattr(callback, "should_stop") and callback.should_stop:
                 return True
         return False
 

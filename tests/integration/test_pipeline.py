@@ -23,6 +23,7 @@ class TestModelPipeline:
 
         # Save to temp file
         import cv2
+
         with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as f:
             cv2.imwrite(f.name, img)
             yield f.name
@@ -40,9 +41,15 @@ class TestModelPipeline:
             architecture="yolov8n",
             num_classes=9,
             class_names=[
-                "SCD", "fairy_circle", "fairy_fort", "farm_circle",
-                "flooded_dune", "impact_crater", "karst", "salt_lake",
-                "thermokarst"
+                "SCD",
+                "fairy_circle",
+                "fairy_fort",
+                "farm_circle",
+                "flooded_dune",
+                "impact_crater",
+                "karst",
+                "salt_lake",
+                "thermokarst",
             ],
             input_size=640,
             confidence_threshold=0.5,
@@ -257,8 +264,10 @@ class TestCoordinateHandling:
 
         # Distance from São Paulo to Rio de Janeiro (~360 km)
         distance = handler.haversine_distance(
-            -46.6333, -23.5505,  # São Paulo
-            -43.1729, -22.9068,  # Rio de Janeiro
+            -46.6333,
+            -23.5505,  # São Paulo
+            -43.1729,
+            -22.9068,  # Rio de Janeiro
         )
 
         # Should be approximately 360 km

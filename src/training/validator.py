@@ -14,6 +14,7 @@ import numpy as np
 @dataclass
 class ValidationResult:
     """Result from model validation."""
+
     accuracy: float
     precision: Dict[str, float]
     recall: Dict[str, float]
@@ -25,13 +26,13 @@ class ValidationResult:
     def to_dict(self) -> Dict:
         """Convert to dictionary."""
         return {
-            'accuracy': self.accuracy,
-            'precision': self.precision,
-            'recall': self.recall,
-            'f1': self.f1,
-            'confusion_matrix': self.confusion_matrix.tolist(),
-            'per_class_accuracy': self.per_class_accuracy,
-            'support': self.support,
+            "accuracy": self.accuracy,
+            "precision": self.precision,
+            "recall": self.recall,
+            "f1": self.f1,
+            "confusion_matrix": self.confusion_matrix.tolist(),
+            "per_class_accuracy": self.per_class_accuracy,
+            "support": self.support,
         }
 
     @property
@@ -88,9 +89,9 @@ class Validator:
         # Extract predicted classes
         pred_classes = []
         for p in predictions:
-            if hasattr(p, 'class_id'):
+            if hasattr(p, "class_id"):
                 pred_classes.append(p.class_id)
-            elif hasattr(p, 'class_name'):
+            elif hasattr(p, "class_name"):
                 pred_classes.append(self._name_to_id(p.class_name))
             else:
                 pred_classes.append(int(p))
@@ -149,7 +150,7 @@ class Validator:
             predictions.extend(batch_preds)
 
             # Collect ground truth
-            if hasattr(labels, 'tolist'):
+            if hasattr(labels, "tolist"):
                 ground_truth.extend(labels.tolist())
             else:
                 ground_truth.extend(list(labels))
@@ -185,8 +186,7 @@ class Validator:
     ) -> np.ndarray:
         """Compute confusion matrix."""
         num_classes = max(
-            len(self.class_names),
-            int(max(predictions.max(), ground_truth.max())) + 1
+            len(self.class_names), int(max(predictions.max(), ground_truth.max())) + 1
         )
 
         cm = np.zeros((num_classes, num_classes), dtype=np.int64)
@@ -299,7 +299,9 @@ class Validator:
         lines.append("")
 
         # Header
-        lines.append(f"{'Class':<20} {'Precision':>10} {'Recall':>10} {'F1':>10} {'Support':>10}")
+        lines.append(
+            f"{'Class':<20} {'Precision':>10} {'Recall':>10} {'F1':>10} {'Support':>10}"
+        )
         lines.append("-" * 60)
 
         # Per-class metrics
@@ -313,7 +315,9 @@ class Validator:
         lines.append("-" * 60)
 
         # Averages
-        lines.append(f"{'Macro Avg':<20} {result.macro_precision:>10.3f} {result.macro_recall:>10.3f} {result.macro_f1:>10.3f}")
+        lines.append(
+            f"{'Macro Avg':<20} {result.macro_precision:>10.3f} {result.macro_recall:>10.3f} {result.macro_f1:>10.3f}"
+        )
         lines.append("")
         lines.append(f"Overall Accuracy: {result.accuracy:.3f}")
 

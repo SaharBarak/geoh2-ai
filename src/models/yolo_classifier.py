@@ -49,10 +49,7 @@ class YOLOv8Classifier(BaseDetectionModel):
             "yolov8x": "yolov8x-cls.pt",
         }
 
-        model_name = arch_map.get(
-            self.config.architecture,
-            "yolov8n-cls.pt"
-        )
+        model_name = arch_map.get(self.config.architecture, "yolov8n-cls.pt")
 
         # Load pretrained YOLO model
         self._model = YOLO(model_name)
@@ -94,9 +91,7 @@ class YOLOv8Classifier(BaseDetectionModel):
         # Run inference
         with torch.no_grad():
             results = self._model.predict(
-                x,
-                verbose=False,
-                conf=self.config.confidence_threshold
+                x, verbose=False, conf=self.config.confidence_threshold
             )
 
         # Extract probabilities
@@ -170,8 +165,7 @@ class YOLOv8Classifier(BaseDetectionModel):
         )
 
     def _predict_batch_impl(
-        self,
-        images: List[Union[str, Path, np.ndarray]]
+        self, images: List[Union[str, Path, np.ndarray]]
     ) -> List[PredictionResult]:
         """
         Optimized batch prediction using YOLO's native batching.
@@ -211,21 +205,25 @@ class YOLOv8Classifier(BaseDetectionModel):
                     else:
                         probabilities[f"class_{j}"] = float(prob)
 
-                predictions.append(PredictionResult(
-                    class_name=class_name,
-                    class_id=class_id,
-                    confidence=confidence,
-                    probabilities=probabilities,
-                    image_path=image_path,
-                ))
+                predictions.append(
+                    PredictionResult(
+                        class_name=class_name,
+                        class_id=class_id,
+                        confidence=confidence,
+                        probabilities=probabilities,
+                        image_path=image_path,
+                    )
+                )
             else:
-                predictions.append(PredictionResult(
-                    class_name="unknown",
-                    class_id=-1,
-                    confidence=0.0,
-                    probabilities={name: 0.0 for name in self.config.class_names},
-                    image_path=image_path,
-                ))
+                predictions.append(
+                    PredictionResult(
+                        class_name="unknown",
+                        class_id=-1,
+                        confidence=0.0,
+                        probabilities={name: 0.0 for name in self.config.class_names},
+                        image_path=image_path,
+                    )
+                )
 
         return predictions
 
@@ -237,7 +235,7 @@ class YOLOv8Classifier(BaseDetectionModel):
         learning_rate: float = 0.001,
         patience: int = 10,
         save_dir: str = "runs/train",
-        **kwargs
+        **kwargs,
     ) -> Dict:
         """
         Train the YOLOv8 classifier.
@@ -263,7 +261,7 @@ class YOLOv8Classifier(BaseDetectionModel):
             project=save_dir,
             imgsz=self.config.input_size,
             device=self.device,
-            **kwargs
+            **kwargs,
         )
 
         return {
@@ -304,9 +302,7 @@ class YOLOv8Classifier(BaseDetectionModel):
 
         try:
             return sum(
-                p.numel()
-                for p in self._model.model.parameters()
-                if p.requires_grad
+                p.numel() for p in self._model.model.parameters() if p.requires_grad
             )
         except Exception:
             # Fallback for different model structures

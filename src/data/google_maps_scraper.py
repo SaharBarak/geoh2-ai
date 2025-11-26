@@ -17,6 +17,7 @@ import numpy as np
 @dataclass
 class GoogleMapsConfig:
     """Configuration for Google Maps scraping."""
+
     api_key: Optional[str] = None
     zoom_level: int = 18
     image_size: int = 640
@@ -35,6 +36,7 @@ class GoogleMapsConfig:
 @dataclass
 class GoogleMapsImage:
     """Container for Google Maps image."""
+
     image: np.ndarray
     center: Tuple[float, float]  # (lon, lat)
     zoom: int
@@ -154,7 +156,7 @@ class GoogleMapsScraper:
                     metadata={
                         "source": "google_maps_api",
                         "size": size,
-                    }
+                    },
                 )
 
             except Exception as e:
@@ -208,11 +210,14 @@ class GoogleMapsScraper:
             min_dim = min(h, w)
             start_h = (h - min_dim) // 2
             start_w = (w - min_dim) // 2
-            img_array = img_array[start_h:start_h+min_dim, start_w:start_w+min_dim]
+            img_array = img_array[
+                start_h : start_h + min_dim, start_w : start_w + min_dim
+            ]
 
             # Resize if needed
             if img_array.shape[0] != size:
                 import cv2
+
                 img_array = cv2.resize(img_array, (size, size))
 
             return GoogleMapsImage(
@@ -222,7 +227,7 @@ class GoogleMapsScraper:
                 metadata={
                     "source": "selenium",
                     "size": size,
-                }
+                },
             )
 
         except Exception as e:
@@ -230,9 +235,7 @@ class GoogleMapsScraper:
             return None
 
     def download_batch(
-        self,
-        coordinates: List[Tuple[float, float]],
-        **kwargs
+        self, coordinates: List[Tuple[float, float]], **kwargs
     ) -> List[Optional[GoogleMapsImage]]:
         """
         Download images for multiple coordinates.

@@ -183,7 +183,7 @@ class ImageProcessor:
         y = (h - th) // 2
         x = (w - tw) // 2
 
-        return image[y:y+th, x:x+tw]
+        return image[y : y + th, x : x + tw]
 
     def pad_to_square(
         self,
@@ -211,11 +211,13 @@ class ImageProcessor:
         pad_w = (target - w) // 2
 
         if image.ndim == 3:
-            result = np.full((target, target, image.shape[2]), fill_value, dtype=image.dtype)
+            result = np.full(
+                (target, target, image.shape[2]), fill_value, dtype=image.dtype
+            )
         else:
             result = np.full((target, target), fill_value, dtype=image.dtype)
 
-        result[pad_h:pad_h+h, pad_w:pad_w+w] = image
+        result[pad_h : pad_h + h, pad_w : pad_w + w] = image
 
         return result
 
@@ -300,10 +302,12 @@ def compose(*functions: Callable) -> Callable:
     Returns:
         Composed function
     """
+
     def composed(x):
         for f in functions:
             x = f(x)
         return x
+
     return composed
 
 

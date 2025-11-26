@@ -11,6 +11,7 @@ from enum import Enum
 
 class ModelArchitecture(Enum):
     """Supported model architectures."""
+
     YOLOV8N = "yolov8n"
     YOLOV8S = "yolov8s"
     YOLOV8M = "yolov8m"
@@ -20,21 +21,22 @@ class ModelArchitecture(Enum):
 
 # Default class names from research paper (9 classes)
 DEFAULT_CLASS_NAMES = [
-    "SCD",           # Sub-Circular Depression (H2-related)
+    "SCD",  # Sub-Circular Depression (H2-related)
     "fairy_circle",  # Namibian fairy circles
-    "fairy_fort",    # Irish ring forts
-    "farm_circle",   # Agricultural circles
+    "fairy_fort",  # Irish ring forts
+    "farm_circle",  # Agricultural circles
     "flooded_dune",  # Flooded interdune areas
-    "impact_crater", # Meteorite impact structures
-    "karst",         # Karst sinkholes
-    "salt_lake",     # Circular salt lakes
-    "thermokarst",   # Permafrost thaw lakes
+    "impact_crater",  # Meteorite impact structures
+    "karst",  # Karst sinkholes
+    "salt_lake",  # Circular salt lakes
+    "thermokarst",  # Permafrost thaw lakes
 ]
 
 
 @dataclass
 class ModelConfig:
     """Configuration for detection models."""
+
     name: str
     architecture: str = "yolov8n"
     num_classes: int = 9
@@ -54,6 +56,7 @@ class ModelConfig:
 @dataclass(frozen=True)
 class PredictionResult:
     """Immutable prediction result from model inference."""
+
     class_name: str
     class_id: int
     confidence: float

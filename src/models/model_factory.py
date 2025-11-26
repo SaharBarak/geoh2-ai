@@ -59,8 +59,7 @@ class ModelFactory:
         if model_class is None:
             available = ", ".join(cls._model_registry.keys())
             raise ValueError(
-                f"Unknown architecture: {arch}. "
-                f"Available: {available}"
+                f"Unknown architecture: {arch}. " f"Available: {available}"
             )
 
         return model_class(config, weights_path)
@@ -78,7 +77,7 @@ class ModelFactory:
         """
         import yaml
 
-        with open(yaml_path, 'r') as f:
+        with open(yaml_path, "r") as f:
             config_dict = yaml.safe_load(f)
 
         # Extract model config and weights path
@@ -194,9 +193,7 @@ class ModelFactory:
             model_class: Model class (must inherit from BaseDetectionModel)
         """
         if not issubclass(model_class, BaseDetectionModel):
-            raise TypeError(
-                f"Model class must inherit from BaseDetectionModel"
-            )
+            raise TypeError(f"Model class must inherit from BaseDetectionModel")
         cls._model_registry[name.lower()] = model_class
 
     @classmethod
@@ -221,7 +218,7 @@ def create_model(
     """
     if isinstance(config, str):
         # Assume it's a YAML path
-        if Path(config).exists() and config.endswith(('.yaml', '.yml')):
+        if Path(config).exists() and config.endswith((".yaml", ".yml")):
             return ModelFactory.create_from_yaml(config)
         else:
             # Assume it's an architecture name
