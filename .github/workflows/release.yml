@@ -98,7 +98,7 @@ jobs:
           echo "- \`ghcr.io/${{ github.repository }}:${{ github.ref_name }}-gpu\` (GPU)" >> notes.md
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           body_path: notes.md
           files: dist/*
