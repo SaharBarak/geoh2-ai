@@ -299,9 +299,7 @@ class Validator:
         lines.append("")
 
         # Header
-        lines.append(
-            f"{'Class':<20} {'Precision':>10} {'Recall':>10} {'F1':>10} {'Support':>10}"
-        )
+        lines.append(f"{'Class':<20} {'Precision':>10} {'Recall':>10} {'F1':>10} {'Support':>10}")
         lines.append("-" * 60)
 
         # Per-class metrics

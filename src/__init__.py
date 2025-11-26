@@ -30,12 +30,7 @@ from .models import (
     YOLOv8Classifier,
     create_model,
 )
-from .preprocessing import (
-    CoordinateHandler,
-    ImageProcessor,
-    IndexResult,
-    SpectralIndexCalculator,
-)
+from .preprocessing import CoordinateHandler, ImageProcessor, IndexResult, SpectralIndexCalculator
 
 __all__ = [
     # Version info

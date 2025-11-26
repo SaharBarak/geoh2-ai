@@ -121,10 +121,7 @@ class TestAPIIntegration:
     def test_batch_limit(self, client, sample_image_bytes):
         """Test batch size limit."""
         # Create 101 files (over limit)
-        files = [
-            ("files", (f"test{i}.jpg", sample_image_bytes, "image/jpeg"))
-            for i in range(101)
-        ]
+        files = [("files", (f"test{i}.jpg", sample_image_bytes, "image/jpeg")) for i in range(101)]
 
         response = client.post("/api/v1/predict/batch", files=files)
 

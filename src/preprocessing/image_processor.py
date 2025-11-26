@@ -176,9 +176,7 @@ class ImageProcessor:
         th, tw = size
 
         if h < th or w < tw:
-            raise ValueError(
-                f"Image size ({h}, {w}) smaller than crop size ({th}, {tw})"
-            )
+            raise ValueError(f"Image size ({h}, {w}) smaller than crop size ({th}, {tw})")
 
         y = (h - th) // 2
         x = (w - tw) // 2
@@ -211,9 +209,7 @@ class ImageProcessor:
         pad_w = (target - w) // 2
 
         if image.ndim == 3:
-            result = np.full(
-                (target, target, image.shape[2]), fill_value, dtype=image.dtype
-            )
+            result = np.full((target, target, image.shape[2]), fill_value, dtype=image.dtype)
         else:
             result = np.full((target, target), fill_value, dtype=image.dtype)
 

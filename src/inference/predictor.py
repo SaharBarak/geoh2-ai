@@ -55,9 +55,7 @@ class H2SeepPredictor:
         with open(path) as f:
             return yaml.safe_load(f)
 
-    def _config_dict_to_model_config(
-        self, config_dict: Dict, device: str
-    ) -> ModelConfig:
+    def _config_dict_to_model_config(self, config_dict: Dict, device: str) -> ModelConfig:
         """Convert config dictionary to ModelConfig"""
         model_cfg = config_dict["model"]
 
@@ -126,8 +124,7 @@ class H2SeepPredictor:
 
         # Log result
         self.logger.info(
-            f"Prediction: {result['class_name']} "
-            f"(confidence: {result['confidence']:.2%})"
+            f"Prediction: {result['class_name']} " f"(confidence: {result['confidence']:.2%})"
         )
 
         # Save if requested
@@ -136,9 +133,7 @@ class H2SeepPredictor:
 
         return result
 
-    def _save_result(
-        self, result: Dict, image_path: Path, output_dir: Optional[Path]
-    ) -> None:
+    def _save_result(self, result: Dict, image_path: Path, output_dir: Optional[Path]) -> None:
         """Save prediction result to JSON"""
         if output_dir is None:
             output_dir = Path("outputs/predictions")
@@ -194,9 +189,7 @@ class H2SeepPredictor:
         self.logger.info(f"Batch prediction complete: {len(results)} images")
         return results
 
-    def _save_batch_results(
-        self, results: List[Dict], output_dir: Optional[Path]
-    ) -> None:
+    def _save_batch_results(self, results: List[Dict], output_dir: Optional[Path]) -> None:
         """Save batch prediction results to JSON"""
         if output_dir is None:
             output_dir = Path("outputs/predictions")
@@ -264,9 +257,7 @@ def main():
     """Command-line interface for predictor"""
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description="H2 Seep Detection - Single Image Prediction"
-    )
+    parser = argparse.ArgumentParser(description="H2 Seep Detection - Single Image Prediction")
     parser.add_argument("image", type=str, help="Path to input image")
     parser.add_argument(
         "--config",
@@ -274,9 +265,7 @@ def main():
         default="config/model_config.yaml",
         help="Path to model configuration",
     )
-    parser.add_argument(
-        "--weights", type=str, default=None, help="Path to model weights"
-    )
+    parser.add_argument("--weights", type=str, default=None, help="Path to model weights")
     parser.add_argument(
         "--device",
         type=str,
@@ -284,9 +273,7 @@ def main():
         choices=["cuda", "cpu"],
         help="Device to run on",
     )
-    parser.add_argument(
-        "--save", action="store_true", help="Save prediction result to JSON"
-    )
+    parser.add_argument("--save", action="store_true", help="Save prediction result to JSON")
     parser.add_argument(
         "--output-dir",
         type=str,

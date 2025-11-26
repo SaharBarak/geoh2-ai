@@ -32,10 +32,7 @@ class GeologicalContext:
         """Check if geological context is favorable for H2 seeps."""
         # Based on research: H2 seeps associated with sedimentary basins
         # and proximity to faults
-        return (
-            self.in_sedimentary_basin
-            and self.distance_to_fault_km < 50  # Within 50km of fault
-        )
+        return self.in_sedimentary_basin and self.distance_to_fault_km < 50  # Within 50km of fault
 
 
 @dataclass
@@ -155,9 +152,7 @@ class GeologicalFilter:
             reasons.append(f"Within 50km of fault")
         else:
             confidence_adjustment -= 0.05
-            reasons.append(
-                f"Far from known faults ({context.distance_to_fault_km:.1f} km)"
-            )
+            reasons.append(f"Far from known faults ({context.distance_to_fault_km:.1f} km)")
 
         # Check rock type (if available)
         favorable_rocks = ["sedimentary", "sandstone", "limestone", "shale"]
@@ -176,9 +171,7 @@ class GeologicalFilter:
 
         # Determine if passed
         # Apply adjustment to original confidence
-        original_confidence = (
-            prediction.confidence if hasattr(prediction, "confidence") else 0.5
-        )
+        original_confidence = prediction.confidence if hasattr(prediction, "confidence") else 0.5
         adjusted_confidence = original_confidence + confidence_adjustment
 
         # Pass if adjusted confidence still above threshold
@@ -242,9 +235,7 @@ class GeologicalFilter:
             return GeologicalContext(
                 in_sedimentary_basin=in_basin,
                 basin_name=basin_name,
-                distance_to_fault_km=fault_distance
-                if fault_distance != float("inf")
-                else 1000,
+                distance_to_fault_km=fault_distance if fault_distance != float("inf") else 1000,
                 fault_name=fault_name,
                 rock_type=None,  # Would require geological map
                 elevation_m=elevation,
@@ -278,12 +269,7 @@ class GeologicalFilter:
             row, col = self._dem.index(lon, lat)
             data = self._dem.read(1)
 
-            if (
-                row > 0
-                and row < data.shape[0] - 1
-                and col > 0
-                and col < data.shape[1] - 1
-            ):
+            if row > 0 and row < data.shape[0] - 1 and col > 0 and col < data.shape[1] - 1:
                 window = data[row - 1 : row + 2, col - 1 : col + 2]
                 dz_dx = (window[1, 2] - window[1, 0]) / (2 * self._dem.res[0])
                 dz_dy = (window[2, 1] - window[0, 1]) / (2 * self._dem.res[1])
@@ -368,8 +354,7 @@ class KnownH2FieldsChecker:
 
         for location in self.locations:
             distance = (
-                handler.haversine_distance(lon, lat, location["lon"], location["lat"])
-                / 1000
+                handler.haversine_distance(lon, lat, location["lon"], location["lat"]) / 1000
             )  # Convert to km
 
             if distance <= location["radius_km"]:

@@ -55,9 +55,7 @@ class SpatialAnalyzer:
         self.distance_threshold_km = distance_threshold_km
         self.min_cluster_size = min_cluster_size
 
-    def haversine_distance(
-        self, coord1: Tuple[float, float], coord2: Tuple[float, float]
-    ) -> float:
+    def haversine_distance(self, coord1: Tuple[float, float], coord2: Tuple[float, float]) -> float:
         """
         Calculate haversine distance between two coordinates.
 
@@ -82,9 +80,7 @@ class SpatialAnalyzer:
 
         return c * r
 
-    def compute_distance_matrix(
-        self, coordinates: List[Tuple[float, float]]
-    ) -> np.ndarray:
+    def compute_distance_matrix(self, coordinates: List[Tuple[float, float]]) -> np.ndarray:
         """
         Compute pairwise distance matrix.
 
@@ -128,9 +124,9 @@ class SpatialAnalyzer:
         # eps in radians: distance_km / earth_radius_km
         eps_rad = self.distance_threshold_km / 6371.0
 
-        clustering = DBSCAN(
-            eps=eps_rad, min_samples=self.min_cluster_size, metric="haversine"
-        ).fit(coords_rad)
+        clustering = DBSCAN(eps=eps_rad, min_samples=self.min_cluster_size, metric="haversine").fit(
+            coords_rad
+        )
 
         labels = clustering.labels_
 
@@ -207,9 +203,7 @@ class SpatialAnalyzer:
         n_clusters = len(clusters)
         n_noise = np.sum(labels == -1)
         clustered_percentage = (
-            (len(coordinates) - n_noise) / len(coordinates)
-            if len(coordinates) > 0
-            else 0.0
+            (len(coordinates) - n_noise) / len(coordinates) if len(coordinates) > 0 else 0.0
         )
 
         stats = {
@@ -220,21 +214,15 @@ class SpatialAnalyzer:
             "avg_nearest_neighbor_km": avg_nn_distance,
             "median_nearest_neighbor_km": median_nn_distance,
             "clusters": [c.to_dict() for c in clusters],
-            "high_priority_clusters": [
-                c.to_dict() for c in clusters if c.is_high_priority()
-            ],
+            "high_priority_clusters": [c.to_dict() for c in clusters if c.is_high_priority()],
         }
 
         if predictions:
             scd_coords = [
-                coord
-                for coord, pred in zip(coordinates, predictions)
-                if pred.class_name == "SCD"
+                coord for coord, pred in zip(coordinates, predictions) if pred.class_name == "SCD"
             ]
             stats["scd_count"] = len(scd_coords)
-            stats["scd_percentage"] = (
-                len(scd_coords) / len(predictions) if predictions else 0.0
-            )
+            stats["scd_percentage"] = len(scd_coords) / len(predictions) if predictions else 0.0
 
         return stats
 

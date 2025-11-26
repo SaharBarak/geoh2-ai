@@ -154,8 +154,7 @@ class EnsembleModel(BaseDetectionModel):
         class_name = self.config.class_names[class_id]
 
         probabilities = {
-            name: float(prob)
-            for name, prob in zip(self.config.class_names, aggregated_probs)
+            name: float(prob) for name, prob in zip(self.config.class_names, aggregated_probs)
         }
 
         return PredictionResult(
@@ -170,9 +169,7 @@ class EnsembleModel(BaseDetectionModel):
             },
         )
 
-    def _predict_batch_impl(
-        self, images: List[Union[str, np.ndarray]]
-    ) -> List[PredictionResult]:
+    def _predict_batch_impl(self, images: List[Union[str, np.ndarray]]) -> List[PredictionResult]:
         """Batch prediction for ensemble."""
         # Get batch predictions from each model
         all_model_results = []
@@ -202,8 +199,7 @@ class EnsembleModel(BaseDetectionModel):
             class_name = self.config.class_names[class_id]
 
             probabilities = {
-                name: float(prob)
-                for name, prob in zip(self.config.class_names, aggregated_probs)
+                name: float(prob) for name, prob in zip(self.config.class_names, aggregated_probs)
             }
 
             final_results.append(
@@ -231,9 +227,7 @@ class EnsembleModel(BaseDetectionModel):
         Export ensemble is not directly supported.
         Export individual models instead.
         """
-        raise NotImplementedError(
-            "Ensemble export not supported. Export individual models."
-        )
+        raise NotImplementedError("Ensemble export not supported. Export individual models.")
 
     def get_model_info(self) -> Dict:
         """Get information about the ensemble."""

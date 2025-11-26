@@ -62,9 +62,7 @@ class Sentinel2Image:
     def get_band(self, band_name: str) -> np.ndarray:
         """Get a specific band."""
         if band_name not in self.bands:
-            raise KeyError(
-                f"Band {band_name} not available. Available: {list(self.bands.keys())}"
-            )
+            raise KeyError(f"Band {band_name} not available. Available: {list(self.bands.keys())}")
         return self.bands[band_name]
 
 
@@ -115,9 +113,7 @@ class Sentinel2Fetcher:
             return True
 
         except ImportError:
-            print(
-                "Sentinel Hub SDK not installed. Install with: pip install sentinelhub"
-            )
+            print("Sentinel Hub SDK not installed. Install with: pip install sentinelhub")
             return False
 
     def _init_earth_engine(self):
@@ -136,9 +132,7 @@ class Sentinel2Fetcher:
             return True
 
         except ImportError:
-            print(
-                "Earth Engine API not installed. Install with: pip install earthengine-api"
-            )
+            print("Earth Engine API not installed. Install with: pip install earthengine-api")
             return False
 
     def fetch(
@@ -228,9 +222,7 @@ class Sentinel2Fetcher:
                     )
                 ],
                 responses=[
-                    self._SentinelHubRequest.output_response(
-                        "default", self._MimeType.TIFF
-                    )
+                    self._SentinelHubRequest.output_response("default", self._MimeType.TIFF)
                 ],
                 bbox=self._BBox(bbox.to_tuple(), crs=self._CRS.WGS84),
                 size=(
@@ -289,9 +281,7 @@ class Sentinel2Fetcher:
                 ee.ImageCollection("COPERNICUS/S2_SR")
                 .filterBounds(region)
                 .filterDate(start_date, end_date)
-                .filter(
-                    ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE", self.config.max_cloud_cover)
-                )
+                .filter(ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE", self.config.max_cloud_cover))
                 .sort("CLOUDY_PIXEL_PERCENTAGE")
             )
 
@@ -312,17 +302,13 @@ class Sentinel2Fetcher:
             bands = {}
             for band_name in self.config.bands:
                 if band_name in data["properties"]:
-                    bands[band_name] = np.array(
-                        data["properties"][band_name], dtype=np.float32
-                    )
+                    bands[band_name] = np.array(data["properties"][band_name], dtype=np.float32)
 
             # Get metadata
             info = image.getInfo()
             cloud_cover = info.get("properties", {}).get("CLOUDY_PIXEL_PERCENTAGE", 0)
             date_str = info.get("properties", {}).get("system:time_start", 0)
-            date = (
-                datetime.fromtimestamp(date_str / 1000) if date_str else datetime.now()
-            )
+            date = datetime.fromtimestamp(date_str / 1000) if date_str else datetime.now()
 
             return Sentinel2Image(
                 bands=bands,

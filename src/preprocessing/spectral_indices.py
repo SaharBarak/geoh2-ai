@@ -53,9 +53,7 @@ class SpectralIndexCalculator:
         """List of available spectral indices."""
         return list(self._indices.keys())
 
-    def _safe_divide(
-        self, numerator: np.ndarray, denominator: np.ndarray
-    ) -> np.ndarray:
+    def _safe_divide(self, numerator: np.ndarray, denominator: np.ndarray) -> np.ndarray:
         """
         Safe division handling zero denominators.
 
@@ -67,9 +65,7 @@ class SpectralIndexCalculator:
             Result with NaN where denominator is zero
         """
         with np.errstate(divide="ignore", invalid="ignore"):
-            result = np.where(
-                np.abs(denominator) > self.epsilon, numerator / denominator, np.nan
-            )
+            result = np.where(np.abs(denominator) > self.epsilon, numerator / denominator, np.nan)
         return result
 
     def _validate_band(self, band: np.ndarray, name: str) -> np.ndarray:
@@ -94,9 +90,7 @@ class SpectralIndexCalculator:
 
         return band
 
-    def compute(
-        self, index_name: str, bands: Dict[str, np.ndarray], **kwargs
-    ) -> IndexResult:
+    def compute(self, index_name: str, bands: Dict[str, np.ndarray], **kwargs) -> IndexResult:
         """
         Compute a spectral index.
 
@@ -144,9 +138,7 @@ class SpectralIndexCalculator:
                 continue
         return results
 
-    def compute_all(
-        self, bands: Dict[str, np.ndarray], **kwargs
-    ) -> Dict[str, IndexResult]:
+    def compute_all(self, bands: Dict[str, np.ndarray], **kwargs) -> Dict[str, IndexResult]:
         """
         Compute all available indices.
 

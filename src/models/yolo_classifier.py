@@ -90,9 +90,7 @@ class YOLOv8Classifier(BaseDetectionModel):
 
         # Run inference
         with torch.no_grad():
-            results = self._model.predict(
-                x, verbose=False, conf=self.config.confidence_threshold
-            )
+            results = self._model.predict(x, verbose=False, conf=self.config.confidence_threshold)
 
         # Extract probabilities
         if results and len(results) > 0:
@@ -301,9 +299,7 @@ class YOLOv8Classifier(BaseDetectionModel):
             return 0
 
         try:
-            return sum(
-                p.numel() for p in self._model.model.parameters() if p.requires_grad
-            )
+            return sum(p.numel() for p in self._model.model.parameters() if p.requires_grad)
         except Exception:
             # Fallback for different model structures
             return 0

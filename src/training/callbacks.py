@@ -146,9 +146,7 @@ class EarlyStoppingCallback(Callback):
 
             if self.counter >= self.patience:
                 self.should_stop = True
-                print(
-                    f"\nEarly stopping triggered after {self.counter} epochs without improvement"
-                )
+                print(f"\nEarly stopping triggered after {self.counter} epochs without improvement")
 
                 if self.restore_best_weights:
                     self._restore_weights()
@@ -167,8 +165,7 @@ class EarlyStoppingCallback(Callback):
                 import torch
 
                 self.best_weights = {
-                    k: v.clone()
-                    for k, v in self.trainer.model._model.state_dict().items()
+                    k: v.clone() for k, v in self.trainer.model._model.state_dict().items()
                 }
             except Exception:
                 pass
@@ -233,9 +230,7 @@ class CheckpointCallback(Callback):
         # Check if should save
         if self.save_best_only:
             is_improvement = (
-                current > self.best_value
-                if self.mode == "max"
-                else current < self.best_value
+                current > self.best_value if self.mode == "max" else current < self.best_value
             )
 
             if is_improvement:
@@ -417,11 +412,7 @@ class ProgressCallback(Callback):
                 }
             )
         else:
-            print(
-                f"Epoch {epoch + 1}: "
-                f"loss={train_loss:.4f}, "
-                f"acc={val_accuracy:.2%}"
-            )
+            print(f"Epoch {epoch + 1}: " f"loss={train_loss:.4f}, " f"acc={val_accuracy:.2%}")
 
 
 def create_default_callbacks(

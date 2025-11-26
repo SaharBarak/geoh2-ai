@@ -58,9 +58,7 @@ class ModelFactory:
 
         if model_class is None:
             available = ", ".join(cls._model_registry.keys())
-            raise ValueError(
-                f"Unknown architecture: {arch}. " f"Available: {available}"
-            )
+            raise ValueError(f"Unknown architecture: {arch}. " f"Available: {available}")
 
         return model_class(config, weights_path)
 

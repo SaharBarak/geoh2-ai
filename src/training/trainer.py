@@ -293,9 +293,7 @@ class Trainer:
                 metrics_history["train_loss"].append(avg_train_loss)
 
                 # Validation phase
-                val_loss, val_accuracy = self._validate_epoch(
-                    model, val_loader, criterion, device
-                )
+                val_loss, val_accuracy = self._validate_epoch(model, val_loader, criterion, device)
                 metrics_history["val_loss"].append(val_loss)
                 metrics_history["val_accuracy"].append(val_accuracy)
 

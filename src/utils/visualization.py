@@ -42,9 +42,7 @@ def plot_confusion_matrix(
 
     # Normalize if requested
     if normalize:
-        cm = confusion_matrix.astype("float") / (
-            confusion_matrix.sum(axis=1, keepdims=True) + 1e-8
-        )
+        cm = confusion_matrix.astype("float") / (confusion_matrix.sum(axis=1, keepdims=True) + 1e-8)
     else:
         cm = confusion_matrix
 
@@ -455,9 +453,7 @@ def create_prediction_report(
     scd_count = class_counts.get("SCD", 0)
     total = len(predictions)
 
-    high_conf_scds = sum(
-        1 for p in predictions if p.class_name == "SCD" and p.confidence > 0.7
-    )
+    high_conf_scds = sum(1 for p in predictions if p.class_name == "SCD" and p.confidence > 0.7)
 
     summary = f"""
 # Prediction Report: {report_name}

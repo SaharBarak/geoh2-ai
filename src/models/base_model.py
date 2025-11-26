@@ -110,9 +110,7 @@ class BaseDetectionModel(ABC):
 
         return img
 
-    def postprocess(
-        self, output: np.ndarray, image_path: Optional[str] = None
-    ) -> PredictionResult:
+    def postprocess(self, output: np.ndarray, image_path: Optional[str] = None) -> PredictionResult:
         """
         Convert model output to PredictionResult.
 
@@ -139,9 +137,7 @@ class BaseDetectionModel(ABC):
         class_name = self.config.class_names[class_id]
 
         # Build probability dictionary
-        probabilities = {
-            name: float(prob) for name, prob in zip(self.config.class_names, probs)
-        }
+        probabilities = {name: float(prob) for name, prob in zip(self.config.class_names, probs)}
 
         return PredictionResult(
             class_name=class_name,

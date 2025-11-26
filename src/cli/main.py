@@ -113,9 +113,7 @@ def predict_batch(args):
                 "scd_count": scd_count,
                 "threshold": args.threshold,
             },
-            "predictions": [
-                {**r.to_dict(), "image": img} for r, img in zip(results, images)
-            ],
+            "predictions": [{**r.to_dict(), "image": img} for r, img in zip(results, images)],
         }
 
         with open(args.output, "w") as f:
@@ -218,9 +216,7 @@ def calculate_indices(args):
 
     print(f"\nComputed indices:")
     for name, result in results.items():
-        print(
-            f"  {name}: mean={np.nanmean(result.value):.4f}, range={result.valid_range}"
-        )
+        print(f"  {name}: mean={np.nanmean(result.value):.4f}, range={result.valid_range}")
 
     # Save results
     if args.output:

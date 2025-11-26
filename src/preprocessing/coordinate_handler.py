@@ -37,9 +37,7 @@ class BoundingBox:
 
     def contains(self, lon: float, lat: float) -> bool:
         """Check if point is within bounding box."""
-        return (
-            self.min_lon <= lon <= self.max_lon and self.min_lat <= lat <= self.max_lat
-        )
+        return self.min_lon <= lon <= self.max_lon and self.min_lat <= lat <= self.max_lat
 
     def expand(self, factor: float) -> "BoundingBox":
         """Expand bounding box by factor."""
@@ -214,10 +212,7 @@ class CoordinateHandler:
         dlat = np.radians(lat2 - lat1)
         dlon = np.radians(lon2 - lon1)
 
-        a = (
-            np.sin(dlat / 2) ** 2
-            + np.cos(lat1_rad) * np.cos(lat2_rad) * np.sin(dlon / 2) ** 2
-        )
+        a = np.sin(dlat / 2) ** 2 + np.cos(lat1_rad) * np.cos(lat2_rad) * np.sin(dlon / 2) ** 2
         c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
 
         return R * c

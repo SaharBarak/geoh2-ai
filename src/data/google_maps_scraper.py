@@ -212,9 +212,7 @@ class GoogleMapsScraper:
             min_dim = min(h, w)
             start_h = (h - min_dim) // 2
             start_w = (w - min_dim) // 2
-            img_array = img_array[
-                start_h : start_h + min_dim, start_w : start_w + min_dim
-            ]
+            img_array = img_array[start_h : start_h + min_dim, start_w : start_w + min_dim]
 
             # Resize if needed
             if img_array.shape[0] != size:
