@@ -53,19 +53,24 @@ class SpectralIndexCalculator:
         """List of available spectral indices."""
         return list(self._indices.keys())
 
-    def _safe_divide(self, numerator: np.ndarray, denominator: np.ndarray) -> np.ndarray:
+    def _safe_divide(
+        self, numerator: np.ndarray, denominator: np.ndarray, fill_value: float = np.nan
+    ) -> np.ndarray:
         """
         Safe division handling zero denominators.
 
         Args:
             numerator: Numerator array
             denominator: Denominator array
+            fill_value: Value to use where denominator is zero (default: NaN)
 
         Returns:
-            Result with NaN where denominator is zero
+            Result with fill_value where denominator is zero
         """
         with np.errstate(divide="ignore", invalid="ignore"):
-            result = np.where(np.abs(denominator) > self.epsilon, numerator / denominator, np.nan)
+            result = np.where(
+                np.abs(denominator) > self.epsilon, numerator / denominator, fill_value
+            )
         return result
 
     def _validate_band(self, band: np.ndarray, name: str) -> np.ndarray:
@@ -116,26 +121,39 @@ class SpectralIndexCalculator:
         return calc_func(bands=bands, **kwargs)
 
     def compute_multiple(
-        self, index_names: List[str], bands: Dict[str, np.ndarray], **kwargs
-    ) -> Dict[str, IndexResult]:
+        self,
+        index_names: List[str],
+        bands: Dict[str, np.ndarray],
+        stack: bool = False,
+        **kwargs,
+    ) -> Union[Dict[str, IndexResult], np.ndarray]:
         """
         Compute multiple spectral indices.
 
         Args:
             index_names: List of index names
             bands: Dictionary of band arrays
+            stack: If True, return stacked numpy array instead of dict
             **kwargs: Additional arguments
 
         Returns:
-            Dictionary of index results
+            Dictionary of index results, or stacked numpy array if stack=True
         """
         results = {}
         for name in index_names:
             try:
                 results[name] = self.compute(name, bands, **kwargs)
-            except KeyError as e:
+            except KeyError:
                 # Missing band, skip this index
                 continue
+
+        if stack:
+            # Stack results into (H, W, N) array
+            arrays = [results[name].value for name in index_names if name in results]
+            if arrays:
+                return np.stack(arrays, axis=-1)
+            return np.array([])
+
         return results
 
     def compute_all(self, bands: Dict[str, np.ndarray], **kwargs) -> Dict[str, IndexResult]:

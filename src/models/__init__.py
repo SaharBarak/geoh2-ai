@@ -44,6 +44,7 @@ class ModelConfig:
     input_size: int = 640
     confidence_threshold: float = 0.5
     device: str = "auto"  # "auto", "cuda", "cpu", "mps"
+    positive_class_idx: int = 0  # Index of positive class (SCD) for H2 detection
 
     def __post_init__(self):
         if len(self.class_names) != self.num_classes:
@@ -51,6 +52,24 @@ class ModelConfig:
                 f"Number of class names ({len(self.class_names)}) "
                 f"must match num_classes ({self.num_classes})"
             )
+
+        # Resolve "auto" device to actual available device
+        if self.device == "auto":
+            object.__setattr__(self, "device", self._resolve_device())
+
+    @staticmethod
+    def _resolve_device() -> str:
+        """Resolve the best available device."""
+        try:
+            import torch
+
+            if torch.cuda.is_available():
+                return "cuda"
+            elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+                return "mps"
+        except ImportError:
+            pass
+        return "cpu"
 
 
 @dataclass(frozen=True)

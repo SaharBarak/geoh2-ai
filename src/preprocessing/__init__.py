@@ -38,11 +38,20 @@ class IndexResult:
     valid_range: Tuple[float, float]
     metadata: Optional[Dict] = None
 
-    def to_uint8(self) -> np.ndarray:
-        """Convert to 8-bit image for visualization."""
+    def normalize(self) -> np.ndarray:
+        """
+        Normalize values to 0-1 range based on valid_range.
+
+        Returns:
+            Normalized array with values between 0 and 1
+        """
         min_val, max_val = self.valid_range
         normalized = (self.value - min_val) / (max_val - min_val)
-        normalized = np.clip(normalized, 0, 1)
+        return np.clip(normalized, 0, 1)
+
+    def to_uint8(self) -> np.ndarray:
+        """Convert to 8-bit image for visualization."""
+        normalized = self.normalize()
         return (normalized * 255).astype(np.uint8)
 
     def mask_invalid(self, fill_value: float = np.nan) -> np.ndarray:
