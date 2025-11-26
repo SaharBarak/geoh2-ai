@@ -107,7 +107,7 @@ CMD ["uvicorn", "src.api:app", "--host", "0.0.0.0", "--port", "8000", "--reload"
 # =============================================================================
 # Stage 5: GPU image (CUDA support)
 # =============================================================================
-FROM nvidia/cuda:11.8-cudnn8-runtime-ubuntu22.04 as gpu
+FROM nvidia/cuda:12.2.2-cudnn8-runtime-ubuntu22.04 as gpu
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
